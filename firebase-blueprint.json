@@ -1,0 +1,87 @@
+{
+  "entities": {
+    "User": {
+      "title": "User",
+      "description": "User profile information",
+      "type": "object",
+      "properties": {
+        "uid": { "type": "string" },
+        "displayName": { "type": "string" },
+        "phoneNumber": { "type": "string" },
+        "photoURL": { "type": "string" },
+        "userType": { "type": "string", "enum": ["buyer", "seller"] },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["uid", "phoneNumber"]
+    },
+    "Business": {
+      "title": "Business",
+      "description": "UMKM or Service listing",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "name": { "type": "string" },
+        "category": { "type": "string" },
+        "description": { "type": "string" },
+        "address": { "type": "string" },
+        "rt": { "type": "string" },
+        "rw": { "type": "string" },
+        "whatsapp": { "type": "string" },
+        "photoURL": { "type": "string" },
+        "ownerId": { "type": "string" },
+        "rating": { "type": "number" },
+        "reviewCount": { "type": "integer" },
+        "createdAt": { "type": "string", "format": "date-time" },
+        "updatedAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["name", "category", "ownerId", "whatsapp"]
+    },
+    "Promo": {
+      "title": "Promo",
+      "description": "Daily promo or status",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "businessId": { "type": "string" },
+        "content": { "type": "string" },
+        "photoURL": { "type": "string" },
+        "expiresAt": { "type": "string", "format": "date-time" },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["businessId", "content", "expiresAt"]
+    },
+    "Review": {
+      "title": "Review",
+      "description": "User review for a business",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "businessId": { "type": "string" },
+        "userId": { "type": "string" },
+        "userName": { "type": "string" },
+        "rating": { "type": "number" },
+        "comment": { "type": "string" },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["businessId", "userId", "rating"]
+    }
+  },
+  "firestore": {
+    "users/{userId}": {
+      "schema": "User",
+      "description": "User profiles"
+    },
+    "businesses/{businessId}": {
+      "schema": "Business",
+      "description": "Local business listings"
+    },
+    "businesses/{businessId}/promos/{promoId}": {
+      "schema": "Promo",
+      "description": "Daily promos for a business"
+    },
+    "businesses/{businessId}/reviews/{reviewId}": {
+      "schema": "Review",
+      "description": "Reviews for a business"
+    }
+  }
+}
