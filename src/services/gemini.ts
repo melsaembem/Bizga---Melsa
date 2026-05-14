@@ -1,6 +1,23 @@
 import { GoogleGenAI, Type } from "@google/genai";
 
-const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
+let aiClient: GoogleGenAI | null = null;
+
+function getAIClient() {
+  if (!aiClient) {
+    // Try import.meta.env first (Vite), fallback to process.env (AI Studio build inject)
+    const apiKey = (import.meta as any).env?.VITE_GEMINI_API_KEY || (typeof process !== 'undefined' ? process.env?.GEMINI_API_KEY : undefined);
+    
+    if (!apiKey) {
+      console.warn("Gemini API Key is not set. AI features will not work.");
+      // We still return a client, but it will fail on actual API call instead of crashing the whole app on load
+    }
+    
+    aiClient = new GoogleGenAI({ 
+      apiKey: apiKey || "dummy-key-to-prevent-crash" 
+    });
+  }
+  return aiClient;
+}
 
 export async function generateAdCopy(params: {
   businessName: string;
@@ -9,6 +26,7 @@ export async function generateAdCopy(params: {
   price?: string;
   whatsapp?: string;
 }) {
+  const ai = getAIClient();
   const model = "gemini-3-flash-preview";
   const prompt = `
     Anda adalah seorang copywriter iklan profesional yang ahli dalam pemasaran UMKM lokal di Indonesia.

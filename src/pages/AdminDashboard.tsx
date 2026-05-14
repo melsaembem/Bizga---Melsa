@@ -147,6 +147,37 @@ export default function AdminDashboard() {
     }
   };
 
+  const handleBulkArchive = async () => {
+    if (selectedIds.length === 0) return;
+
+    setIsDeletingBulk(true);
+    try {
+      console.log("📦 Mengarsipkan IDs:", selectedIds);
+      const { data, error } = await supabase
+        .from('businesses')
+        .update({ status: 'archived' })
+        .in('id', selectedIds)
+        .select();
+
+      if (error) {
+        console.error("❌ Supabase Archive Error:", error);
+        throw error;
+      }
+
+      setBusinesses(prev => prev.map(b =>
+        selectedIds.includes(b.id) ? { ...b, status: 'archived' } : b
+      ));
+
+      setSelectedIds([]);
+      setNotification({ type: 'success', message: `Berhasil mengarsipkan ${data?.length || 0} data.` });
+    } catch (err: any) {
+      console.error("🚨 Detail Error Archive:", err);
+      setNotification({ type: 'error', message: `Gagal mengarsipkan: ${err.message || "Terjadi kesalahan"}` });
+    } finally {
+      setIsDeletingBulk(false);
+    }
+  };
+
   const handleBulkRestore = async () => {
     if (selectedIds.length === 0) return;
 
@@ -412,6 +443,17 @@ export default function AdminDashboard() {
                 {isDeletingBulk ? "Menghapus..." : "Hapus"}
               </button>
 
+              {currentTab === 'active' && (
+                <button
+                  onClick={() => setIsConfirmingArchive(true)}
+                  disabled={isDeletingBulk}
+                  className="flex items-center gap-2 px-6 py-2 bg-[#A7C4A0] text-white rounded-xl text-sm font-bold shadow-lg hover:bg-[#8da887] transition-all active:scale-95 disabled:opacity-50"
+                >
+                  <Archive className="w-4 h-4" />
+                  {isDeletingBulk ? "Mengarsipkan..." : "Arsipkan"}
+                </button>
+              )}
+
               {currentTab === 'archived' && (
                 <button
                   onClick={handleBulkRestore}
@@ -428,6 +470,48 @@ export default function AdminDashboard() {
       </AnimatePresence>
       {/* State Modals */}
       <AnimatePresence>
+        {/* Custom Archive Modal */}
+        {isConfirmingArchive && (
+          <motion.div 
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm"
+          >
+            <motion.div 
+              initial={{ scale: 0.95, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0.95, opacity: 0 }}
+              className="bg-white rounded-3xl p-8 max-w-sm w-full shadow-2xl relative border border-white/20"
+            >
+              <div className="w-16 h-16 bg-[#A7C4A0]/20 text-[#A7C4A0] rounded-full flex items-center justify-center mx-auto mb-6">
+                <Archive className="w-8 h-8" />
+              </div>
+              <h3 className="text-xl font-bold text-center text-[#1F3D2B] mb-2">Arsipkan Data?</h3>
+              <p className="text-center text-gray-500 mb-8 text-sm leading-relaxed">
+                Yakin ingin mengarsipkan <b>{selectedIds.length} data</b>? Data akan dipindahkan ke tab Arsip dan tidak muncul di katalog publik.
+              </p>
+              <div className="flex gap-4">
+                <button 
+                  onClick={() => setIsConfirmingArchive(false)}
+                  className="flex-1 px-4 py-3 bg-gray-100 text-gray-600 rounded-xl font-bold text-sm hover:bg-gray-200 transition-colors"
+                >
+                  Batal
+                </button>
+                <button 
+                  onClick={() => {
+                    setIsConfirmingArchive(false);
+                    handleBulkArchive();
+                  }}
+                  className="flex-1 px-4 py-3 bg-[#1F3D2B] text-white rounded-xl font-bold text-sm hover:bg-[#1F3D2B]/90 transition-colors shadow-lg"
+                >
+                  Ya, Arsipkan
+                </button>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+
         {/* Custom Confirmation Modal */}
         {isConfirmingDelete && (
           <motion.div 
