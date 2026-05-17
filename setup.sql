@@ -8,8 +8,8 @@ INSERT INTO storage.buckets (id, name, public) VALUES ('images', 'images', true)
 DROP POLICY IF EXISTS "Public Read Images" ON storage.objects;
 CREATE POLICY "Public Read Images" ON storage.objects FOR SELECT USING (bucket_id = 'images');
 
-DROP POLICY IF EXISTS "Authenticated Upload Images" ON storage.objects;
-CREATE POLICY "Authenticated Upload Images" ON storage.objects FOR INSERT WITH CHECK (bucket_id = 'images' AND auth.role() = 'authenticated');
+DROP POLICY IF EXISTS "Anyone Upload Images" ON storage.objects;
+CREATE POLICY "Anyone Upload Images" ON storage.objects FOR INSERT WITH CHECK (bucket_id = 'images');
 
 DROP POLICY IF EXISTS "Authenticated Update Images" ON storage.objects;
 CREATE POLICY "Authenticated Update Images" ON storage.objects FOR UPDATE USING (bucket_id = 'images' AND auth.role() = 'authenticated');
@@ -73,11 +73,28 @@ CREATE TABLE IF NOT EXISTS public.user_profiles (
     created_at TIMESTAMPTZ DEFAULT NOW()
 );
 
--- RLS (Row Level Security) Policies
+-- 5. Settings Table
+CREATE TABLE IF NOT EXISTS public.settings (
+    id TEXT PRIMARY KEY,
+    value JSONB NOT NULL,
+    updated_at TIMESTAMPTZ DEFAULT NOW()
+);
 
--- Add missing columns if they don't exist
+-- Enable RLS
+ALTER TABLE public.settings ENABLE ROW LEVEL SECURITY;
+
+-- Settings Policies
+DROP POLICY IF EXISTS "Public Read Settings" ON public.settings;
+CREATE POLICY "Public Read Settings" ON public.settings FOR SELECT USING (true);
+DROP POLICY IF EXISTS "Admin All Settings" ON public.settings;
+CREATE POLICY "Admin All Settings" ON public.settings FOR ALL USING (auth.role() = 'authenticated');
 ALTER TABLE public.businesses ADD COLUMN IF NOT EXISTS status TEXT DEFAULT 'active';
 ALTER TABLE public.businesses ADD COLUMN IF NOT EXISTS full_address TEXT;
+ALTER TABLE public.businesses ADD COLUMN IF NOT EXISTS patokan TEXT;
+ALTER TABLE public.businesses ADD COLUMN IF NOT EXISTS last_payment_date TIMESTAMPTZ;
+ALTER TABLE public.businesses ADD COLUMN IF NOT EXISTS rejection_reason TEXT;
+ALTER TABLE public.businesses ADD COLUMN IF NOT EXISTS registrant_name TEXT;
+ALTER TABLE public.businesses ADD COLUMN IF NOT EXISTS registrant_phone TEXT;
 
 -- Enable RLS
 ALTER TABLE public.businesses ENABLE ROW LEVEL SECURITY;
@@ -89,11 +106,11 @@ ALTER TABLE public.user_profiles ENABLE ROW LEVEL SECURITY;
 DROP POLICY IF EXISTS "Public Read Access" ON public.businesses;
 CREATE POLICY "Public Read Access" ON public.businesses FOR SELECT USING (true);
 DROP POLICY IF EXISTS "Owners can update their own business" ON public.businesses;
-CREATE POLICY "Owners can update their own business" ON public.businesses FOR UPDATE USING (auth.uid() = owner_id);
+CREATE POLICY "Owners can update their own business" ON public.businesses FOR UPDATE USING (auth.uid() = owner_id OR auth.role() = 'authenticated' OR owner_id IS NULL);
 DROP POLICY IF EXISTS "Owners can delete their own business" ON public.businesses;
-CREATE POLICY "Owners can delete their own business" ON public.businesses FOR DELETE USING (auth.uid() = owner_id);
-DROP POLICY IF EXISTS "Authenticated users can create a business" ON public.businesses;
-CREATE POLICY "Authenticated users can create a business" ON public.businesses FOR INSERT WITH CHECK (auth.role() = 'authenticated');
+CREATE POLICY "Owners can delete their own business" ON public.businesses FOR DELETE USING (auth.uid() = owner_id OR auth.role() = 'authenticated');
+DROP POLICY IF EXISTS "Anyone can create a business" ON public.businesses;
+CREATE POLICY "Anyone can create a business" ON public.businesses FOR INSERT WITH CHECK (true);
 
 -- Reviews Policies
 DROP POLICY IF EXISTS "Public Read Reviews" ON public.reviews;

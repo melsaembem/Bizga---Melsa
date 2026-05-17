@@ -15,7 +15,7 @@ export default function Login() {
   const location = useLocation();
   const from = location.state?.from?.pathname || "/admin/dashboard";
 
-  const handleLogin = async (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
     setError("");
@@ -25,12 +25,11 @@ export default function Login() {
         email,
         password,
       });
-
       if (loginError) throw loginError;
       
-      navigate(from, { replace: true });
+      setTimeout(() => navigate(from, { replace: true }), 500);
     } catch (err: any) {
-      console.error("Login error:", err);
+      console.error("Auth error:", err);
       setError("Email atau sandi salah. Silakan coba lagi.");
     } finally {
       setLoading(false);
@@ -48,11 +47,15 @@ export default function Login() {
           <div className="w-16 h-16 bg-[#1F3D2B]/5 rounded-2xl flex items-center justify-center mx-auto mb-4">
             <Lock className="w-8 h-8 text-[#1F3D2B]" />
           </div>
-          <h2 className="text-2xl font-bold text-[#1A1A1A]">Admin Login</h2>
-          <p className="text-sm text-gray-400 mt-1">Akses khusus pengelola Bizga</p>
+          <h2 className="text-2xl font-bold text-[#1A1A1A]">
+            Masuk Admin
+          </h2>
+          <p className="text-sm text-gray-400 mt-1">
+            Hanya untuk pengelola Bizga
+          </p>
         </div>
 
-        <form onSubmit={handleLogin} className="space-y-6">
+        <form onSubmit={handleSubmit} className="space-y-6">
           <AnimatePresence>
             {error && (
               <motion.div 
@@ -68,7 +71,7 @@ export default function Login() {
           </AnimatePresence>
 
           <div className="space-y-2">
-            <label className="text-[10px] font-bold text-gray-400 uppercase tracking-widest ml-1">Email Admin</label>
+            <label className="text-[10px] font-bold text-gray-400 uppercase tracking-widest ml-1">Email</label>
             <div className="relative">
               <Mail className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-300" />
               <input 
@@ -76,7 +79,7 @@ export default function Login() {
                 required
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                placeholder="admin@bizga.id"
+                placeholder="admin@bizga.com"
                 className="w-full pl-12 pr-4 py-4 bg-[#F5F5F5] border-none rounded-2xl focus:ring-2 focus:ring-[#1F3D2B]/10 font-medium transition-all"
               />
             </div>
@@ -89,9 +92,10 @@ export default function Login() {
               <input 
                 type="password" 
                 required
+                minLength={6}
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                placeholder="••••••••"
+                placeholder="••••••"
                 className="w-full pl-12 pr-4 py-4 bg-[#F5F5F5] border-none rounded-2xl focus:ring-2 focus:ring-[#1F3D2B]/10 font-medium transition-all"
               />
             </div>
@@ -105,7 +109,7 @@ export default function Login() {
               loading && "opacity-50 cursor-not-allowed"
             )}
           >
-            {loading ? <Loader2 className="w-5 h-5 animate-spin" /> : "Masuk Sekarang"}
+            {loading ? <Loader2 className="w-5 h-5 animate-spin" /> : "Masuk"}
           </button>
         </form>
 

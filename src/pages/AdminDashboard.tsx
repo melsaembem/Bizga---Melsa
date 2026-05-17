@@ -4,7 +4,7 @@ import { supabase } from "../lib/supabase";
 import { useAuth } from "../App";
 import { Business } from "../types";
 import { motion, AnimatePresence } from "motion/react";
-import { Trash2, ExternalLink, ShieldCheck, BarChart3, Users, Building2, Search, Edit, Share2, Archive, RotateCcw } from "lucide-react";
+import { Trash2, ExternalLink, ShieldCheck, BarChart3, Users, Building2, Search, Edit, Share2, Archive, RotateCcw, CheckCircle, XCircle } from "lucide-react";
 import { formatIDRCurrency, cn } from "../lib/utils";
 
 export default function AdminDashboard() {
@@ -13,17 +13,22 @@ export default function AdminDashboard() {
 
   const [businesses, setBusinesses] = useState<Business[]>([]);
   const [loading, setLoading] = useState(true);
+  const [qrisImage, setQrisImage] = useState<string | null>(null);
+  const [isUploadingQris, setIsUploadingQris] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedIds, setSelectedIds] = useState<string[]>([]);
   const [isDeletingBulk, setIsDeletingBulk] = useState(false);
-  const [currentTab, setCurrentTab] = useState<'active' | 'archived'>('active');
+  const [currentTab, setCurrentTab] = useState<'active' | 'pending' | 'awaiting_payment' | 'rejected' | 'archived' | 'settings'>('active');
   const [isConfirmingArchive, setIsConfirmingArchive] = useState(false);
+  const [isConfirmingReject, setIsConfirmingReject] = useState(false);
+  const [rejectReason, setRejectReason] = useState("");
   
   // Custom states for modals (iframe friendly)
   const [isConfirmingDelete, setIsConfirmingDelete] = useState(false);
   const [notification, setNotification] = useState<{type: 'error' | 'success', message: string} | null>(null);
 
   if (!user) return <Navigate to="/login" />;
+  if (!isSuperAdmin) return <Navigate to="/user/dashboard" />;
 
   useEffect(() => {
     async function fetchAll() {
@@ -34,10 +39,6 @@ export default function AdminDashboard() {
           .from('businesses')
           .select('*')
           .order('created_at', { ascending: false });
-
-        if (!isSuperAdmin) {
-          query = query.eq('owner_id', user.id);
-        }
 
         const { data, error } = await query;
 
@@ -56,6 +57,12 @@ export default function AdminDashboard() {
           alamat: item.full_address,
           linkMaps: item.link_maps
         } as Business)));
+
+        const { data: settingsData } = await supabase.from('settings').select('*').eq('id', 'qris_image').single();
+        if (settingsData && settingsData.value?.url) {
+          setQrisImage(settingsData.value.url);
+        }
+
       } catch (err) {
         console.error(err);
       } finally {
@@ -98,7 +105,6 @@ export default function AdminDashboard() {
     }
   };
 
-  // ✅ PERBAIKAN AKHIR: handleBulkAction dengan Error Handling yang transparan
   const handleBulkAction = async () => {
     if (selectedIds.length === 0) return;
 
@@ -108,9 +114,6 @@ export default function AdminDashboard() {
     const idsToProcess = [...selectedIds];
 
     try {
-      console.log("🗑️ Memulai penghapusan di database untuk IDs:", idsToProcess);
-      
-      // Lakukan penghapusan di Supabase
       const { error } = await supabase
         .from('businesses')
         .delete()
@@ -118,29 +121,20 @@ export default function AdminDashboard() {
 
       if (error) {
         console.error("❌ Supabase Delete Error:", error);
-        
-        // Buat pesan error yang lebih manusiawi untuk user
         let friendlyMessage = error.message;
         if (error.code === '42501') {
           friendlyMessage = "Izin ditolak (RLS). Database tidak mengizinkan Anda menghapus data ini. Pastikan Anda adalah pemilik data atau memiliki hak akses Admin.";
         } else if (error.code === '23503') {
           friendlyMessage = "Gagal menghapus karena data ini masih terhubung dengan ulasan atau promo lain (Foreign Key Constraint).";
         }
-        
         throw new Error(friendlyMessage);
       }
 
-      // Jika sampai sini berarti sukses di database
-      console.log("✅ Database berhasil diperbarui.");
-
-      // Baru update state UI agar data hilang dari display
       setBusinesses(prev => prev.filter(b => !idsToProcess.includes(b.id)));
       setSelectedIds([]);
-      
       setNotification({ type: 'success', message: `Berhasil menghapus ${count} usaha secara permanen.` });
     } catch (err: any) {
       console.error("🚨 Delete Process Failed:", err);
-      // Popup error yang jelas bagi user
       setNotification({ type: 'error', message: `GAGAL MENGHAPUS:\n${err.message || "Terjadi kesalahan pada koneksi server"}` });
     } finally {
       setIsDeletingBulk(false);
@@ -152,27 +146,78 @@ export default function AdminDashboard() {
 
     setIsDeletingBulk(true);
     try {
-      console.log("📦 Mengarsipkan IDs:", selectedIds);
       const { data, error } = await supabase
         .from('businesses')
         .update({ status: 'archived' })
         .in('id', selectedIds)
         .select();
 
-      if (error) {
-        console.error("❌ Supabase Archive Error:", error);
-        throw error;
-      }
+      if (error) throw error;
 
       setBusinesses(prev => prev.map(b =>
         selectedIds.includes(b.id) ? { ...b, status: 'archived' } : b
       ));
 
       setSelectedIds([]);
-      setNotification({ type: 'success', message: `Berhasil mengarsipkan ${data?.length || 0} data.` });
+      setNotification({ type: 'success', message: `Berhasil mengarsipkan data.` });
     } catch (err: any) {
       console.error("🚨 Detail Error Archive:", err);
       setNotification({ type: 'error', message: `Gagal mengarsipkan: ${err.message || "Terjadi kesalahan"}` });
+    } finally {
+      setIsDeletingBulk(false);
+    }
+  };
+
+  const handleBulkApproveToPayment = async () => {
+    if (selectedIds.length === 0) return;
+
+    setIsDeletingBulk(true);
+    try {
+      const { data, error } = await supabase
+        .from('businesses')
+        .update({ status: 'awaiting_payment', rejection_reason: null })
+        .in('id', selectedIds)
+        .select();
+
+      if (error) throw error;
+
+      setBusinesses(prev => prev.map(b =>
+        selectedIds.includes(b.id) ? { ...b, status: 'awaiting_payment', rejection_reason: undefined } as any : b
+      ));
+      setSelectedIds([]);
+      setNotification({ type: 'success', message: `Berhasil menyetujui ${selectedIds.length} data. Menunggu Pembayaran.` });
+    } catch (err: any) {
+      console.error(err);
+      setNotification({ type: 'error', message: err.message });
+    } finally {
+      setIsDeletingBulk(false);
+    }
+  };
+
+  const handleMarkPaid = async () => {
+    if (selectedIds.length === 0) return;
+
+    setIsDeletingBulk(true);
+    try {
+      const now = new Date().toISOString();
+      const { data, error } = await supabase
+        .from('businesses')
+        .update({ last_payment_date: now })
+        .in('id', selectedIds)
+        .select();
+
+      if (error) throw error;
+
+      setBusinesses(prev => prev.map(b =>
+        selectedIds.includes(b.id) ? { ...b, last_payment_date: now } as any : b
+      ));
+
+      setSelectedIds([]);
+      setNotification({ type: 'success', message: `Berhasil menandai ${selectedIds.length} data lunas tagihan bulan ini.` });
+    } catch (err: any) {
+      console.error("🚨 Detail Error Mark Paid:", err);
+      let friendlyMessage = err.message || "Terjadi kesalahan saat memproses data.";
+      setNotification({ type: 'error', message: friendlyMessage });
     } finally {
       setIsDeletingBulk(false);
     }
@@ -183,33 +228,91 @@ export default function AdminDashboard() {
 
     setIsDeletingBulk(true);
     try {
-      console.log("🔄 Memulihkan IDs:", selectedIds);
       const { data, error } = await supabase
         .from('businesses')
-        .update({ status: 'active' })
+        .update({ status: 'active', rejection_reason: null })
         .in('id', selectedIds)
         .select();
 
-      if (error) {
-        console.error("❌ Supabase Restore Error:", error);
-        throw error;
-      }
-
-      if (!data || data.length === 0) {
-        throw new Error("Gagal memulihkan: Izin ditolak atau data tidak ditemukan.");
-      }
+      if (error) throw error;
 
       setBusinesses(prev => prev.map(b =>
-        selectedIds.includes(b.id) ? { ...b, status: 'active' } : b
+        selectedIds.includes(b.id) ? { ...b, status: 'active', rejection_reason: undefined } as any : b
       ));
 
       setSelectedIds([]);
-      setNotification({ type: 'success', message: `Berhasil memulihkan ${data.length} data.` });
+      setNotification({ type: 'success', message: `Berhasil memulihkan/menyetujui data.` });
     } catch (err: any) {
       console.error("🚨 Detail Error Restore:", err);
       setNotification({ type: 'error', message: `Gagal memulihkan: ${err.message || "Terjadi kesalahan"}` });
     } finally {
       setIsDeletingBulk(false);
+    }
+  };
+
+  const handleBulkReject = async () => {
+    if (selectedIds.length === 0) return;
+
+    setIsDeletingBulk(true);
+    try {
+      const { data, error } = await supabase
+        .from('businesses')
+        .update({ status: 'rejected', rejection_reason: rejectReason })
+        .in('id', selectedIds)
+        .select();
+
+      if (error) throw error;
+
+      setBusinesses(prev => prev.map(b =>
+        selectedIds.includes(b.id) ? { ...b, status: 'rejected', rejection_reason: rejectReason } as any : b
+      ));
+
+      setSelectedIds([]);
+      setRejectReason("");
+      setNotification({ type: 'success', message: `Berhasil menolak data.` });
+    } catch (err: any) {
+      console.error("🚨 Detail Error Reject:", err);
+      setNotification({ type: 'error', message: `Gagal menolak: ${err.message || "Terjadi kesalahan"}` });
+    } finally {
+      setIsDeletingBulk(false);
+    }
+  };
+
+  const handleQrisUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    setIsUploadingQris(true);
+    try {
+      const fileExt = file.name.split('.').pop();
+      const fileName = `${Math.random()}.${fileExt}`;
+      const filePath = `qris/${fileName}`;
+
+      const { error: uploadError } = await supabase.storage
+        .from('images')
+        .upload(filePath, file);
+
+      if (uploadError) throw uploadError;
+
+      const { data: urlData } = supabase.storage
+        .from('images')
+        .getPublicUrl(filePath);
+
+      const url = urlData.publicUrl;
+      setQrisImage(url);
+
+      const { error: dbError } = await supabase
+        .from('settings')
+        .upsert({ id: 'qris_image', value: { url } });
+
+      if (dbError) throw dbError;
+
+      setNotification({ type: 'success', message: "QRIS berhasil diperbarui." });
+    } catch (err: any) {
+      console.error(err);
+      setNotification({ type: 'error', message: "Gagal upload QRIS: " + err.message });
+    } finally {
+      setIsUploadingQris(false);
     }
   };
 
@@ -230,14 +333,14 @@ export default function AdminDashboard() {
           </div>
           <div className="flex items-center gap-4">
             <h1 className="text-3xl font-bold text-[#1F3D2B]">
-              {isSuperAdmin ? "Moderasi Katalog" : "Katalog Usaha Saya"}
+              Moderasi Katalog
             </h1>
           </div>
         </div>
 
         <div className="flex gap-4 w-full md:w-auto">
           <Link
-            to="/admin/upload"
+            to="/upload"
             className="bg-[#1F3D2B] text-white px-6 py-2 rounded-xl text-sm font-bold shadow-lg hover:bg-[#D4A373] transition-all flex items-center gap-2"
           >
             Tambah Usaha
@@ -291,32 +394,77 @@ export default function AdminDashboard() {
       </div>
 
       {/* Tabs */}
-      <div className="flex gap-4 border-b border-gray-100">
+      <div className="flex gap-4 border-b border-gray-100 overflow-x-auto">
         <button
           onClick={() => { setCurrentTab('active'); setSelectedIds([]); }}
           className={cn(
-            "pb-4 px-2 text-sm font-bold transition-all border-b-2",
+            "pb-4 px-2 text-sm font-bold transition-all border-b-2 whitespace-nowrap",
             currentTab === 'active'
               ? "text-[#1F3D2B] border-[#1F3D2B]"
               : "text-gray-400 border-transparent hover:text-gray-600"
           )}
         >
-          {isSuperAdmin ? "Katalog Aktif" : "Usaha Aktif"}
+          Katalog Aktif
+        </button>
+        <button
+          onClick={() => { setCurrentTab('pending'); setSelectedIds([]); }}
+          className={cn(
+            "pb-4 px-2 text-sm font-bold transition-all border-b-2 whitespace-nowrap",
+            currentTab === 'pending'
+              ? "text-amber-500 border-amber-500"
+              : "text-gray-400 border-transparent hover:text-gray-600"
+          )}
+        >
+          Menunggu ({businesses.filter(b => b.status === "pending").length})
+        </button>
+        <button
+          onClick={() => { setCurrentTab('awaiting_payment'); setSelectedIds([]); }}
+          className={cn(
+            "pb-4 px-2 text-sm font-bold transition-all border-b-2 whitespace-nowrap",
+            currentTab === 'awaiting_payment'
+              ? "text-blue-500 border-blue-500"
+              : "text-gray-400 border-transparent hover:text-gray-600"
+          )}
+        >
+          Menunggu Pembayaran ({businesses.filter(b => b.status === "awaiting_payment").length})
+        </button>
+        <button
+          onClick={() => { setCurrentTab('rejected'); setSelectedIds([]); }}
+          className={cn(
+            "pb-4 px-2 text-sm font-bold transition-all border-b-2 whitespace-nowrap",
+            currentTab === 'rejected'
+              ? "text-red-500 border-red-500"
+              : "text-gray-400 border-transparent hover:text-gray-600"
+          )}
+        >
+          Ditolak
         </button>
         <button
           onClick={() => { setCurrentTab('archived'); setSelectedIds([]); }}
           className={cn(
-            "pb-4 px-2 text-sm font-bold transition-all border-b-2",
+            "pb-4 px-2 text-sm font-bold transition-all border-b-2 whitespace-nowrap",
             currentTab === 'archived'
               ? "text-[#1F3D2B] border-[#1F3D2B]"
               : "text-gray-400 border-transparent hover:text-gray-600"
           )}
         >
-          {isSuperAdmin ? "Arsip Usaha" : "Arsip Saya"}
+          Arsip Usaha
+        </button>
+        <button
+          onClick={() => { setCurrentTab('settings'); setSelectedIds([]); }}
+          className={cn(
+            "pb-4 px-2 text-sm font-bold transition-all border-b-2 whitespace-nowrap",
+            currentTab === 'settings'
+              ? "text-[#1F3D2B] border-[#1F3D2B]"
+              : "text-gray-400 border-transparent hover:text-gray-600"
+          )}
+        >
+          Pengaturan
         </button>
       </div>
 
       {/* Business List Table */}
+      {currentTab !== 'settings' ? (
       <div className="bg-white rounded-3xl shadow-sm border border-black/5 overflow-hidden">
         <div className="overflow-x-auto">
           <table className="w-full text-left">
@@ -337,11 +485,17 @@ export default function AdminDashboard() {
                 <th className="px-6 py-4">Kontak</th>
                 <th className="px-6 py-4">Harga</th>
                 <th className="px-6 py-4">Lokasi</th>
+                {currentTab === 'active' && <th className="px-6 py-4">Status Sewa</th>}
                 <th className="px-6 py-4 text-right">Aksi</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-50">
-              {filtered.map((b) => (
+              {filtered.map((b) => {
+                const now = new Date();
+                const lastPayment = b.last_payment_date ? new Date(b.last_payment_date) : null;
+                const isPaidThisMonth = lastPayment && lastPayment.getMonth() === now.getMonth() && lastPayment.getFullYear() === now.getFullYear();
+
+                return (
                 <tr key={b.id} className={cn("hover:bg-gray-50 transition-colors", selectedIds.includes(b.id) && "bg-[#F5F5F5]")}>
                   <td className="px-6 py-4">
                     <input
@@ -372,6 +526,15 @@ export default function AdminDashboard() {
                   <td className="px-6 py-4">
                     <p className="text-xs font-medium">RT {b.rt} / RW {b.rw}</p>
                   </td>
+                  {currentTab === 'active' && (
+                  <td className="px-6 py-4">
+                    {isPaidThisMonth ? (
+                      <span className="text-[10px] font-bold text-green-600 bg-green-50 px-2 py-1 rounded-md">Lunas Bulan Ini</span>
+                    ) : (
+                      <span className="text-[10px] font-bold text-amber-600 bg-amber-50 px-2 py-1 rounded-md">Belum Lunas</span>
+                    )}
+                  </td>
+                  )}
                   <td className="px-6 py-4 text-right">
                     <div className="flex justify-end gap-2">
                       <button
@@ -398,7 +561,8 @@ export default function AdminDashboard() {
                     </div>
                   </td>
                 </tr>
-              ))}
+              );
+              })}
             </tbody>
           </table>
           {filtered.length === 0 && (
@@ -408,6 +572,37 @@ export default function AdminDashboard() {
           )}
         </div>
       </div>
+      ) : (
+        <div className="bg-white rounded-3xl shadow-sm border border-black/5 p-8 max-w-xl">
+          <h2 className="text-xl font-bold text-[#1F3D2B] mb-6">Pengaturan Pembayaran (QRIS)</h2>
+          <div className="space-y-4">
+            <p className="text-sm text-gray-500">
+              Upload foto/gambar QRIS Admin. Gambar ini akan ditampilkan di halaman Riwayat pendafar untuk mereka melakukan pembayaran sewa bulanan.
+            </p>
+            
+            {qrisImage && (
+              <div className="w-48 h-48 rounded-xl overflow-hidden border-2 border-gray-200">
+                <img src={qrisImage} alt="QRIS" className="w-full h-full object-cover" />
+              </div>
+            )}
+            
+            <div className="mt-4">
+              <label className="inline-block">
+                <span className="px-6 py-3 bg-[#D4A373] text-white text-sm font-bold rounded-xl cursor-pointer hover:bg-[#c29161] transition-colors flex items-center justify-center">
+                  {isUploadingQris ? "Mengupload..." : "Upload Gambar QRIS"}
+                </span>
+                <input 
+                  type="file" 
+                  accept="image/*" 
+                  className="hidden" 
+                  onChange={handleQrisUpload} 
+                  disabled={isUploadingQris}
+                />
+              </label>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Floating Bulk Action Bar */}
       <AnimatePresence>
@@ -444,13 +639,76 @@ export default function AdminDashboard() {
               </button>
 
               {currentTab === 'active' && (
+                <>
+                  <button
+                    onClick={handleMarkPaid}
+                    disabled={isDeletingBulk}
+                    className="flex items-center gap-2 px-6 py-2 bg-blue-500 text-white rounded-xl text-sm font-bold shadow-lg hover:bg-blue-600 transition-all active:scale-95 disabled:opacity-50"
+                  >
+                    <CheckCircle className="w-4 h-4" />
+                    Tandai Lunas
+                  </button>
+                  <button
+                    onClick={() => setIsConfirmingArchive(true)}
+                    disabled={isDeletingBulk}
+                    className="flex items-center gap-2 px-6 py-2 bg-[#A7C4A0] text-white rounded-xl text-sm font-bold shadow-lg hover:bg-[#8da887] transition-all active:scale-95 disabled:opacity-50"
+                  >
+                    <Archive className="w-4 h-4" />
+                    {isDeletingBulk ? "Mengarsipkan..." : "Arsipkan"}
+                  </button>
+                </>
+              )}
+
+              {currentTab === 'pending' && (
+                <>
+                  <button
+                    onClick={handleBulkApproveToPayment}
+                    disabled={isDeletingBulk}
+                    className="flex items-center gap-2 px-6 py-2 bg-blue-500 text-white rounded-xl text-sm font-bold shadow-lg hover:bg-blue-600 transition-all active:scale-95 disabled:opacity-50"
+                  >
+                    <CheckCircle className="w-4 h-4" />
+                    Setujui (Tunggu Pembayaran)
+                  </button>
+                  <button
+                    onClick={() => setIsConfirmingReject(true)}
+                    disabled={isDeletingBulk}
+                    className="flex items-center gap-2 px-6 py-2 bg-amber-500 text-white rounded-xl text-sm font-bold shadow-lg hover:bg-amber-600 transition-all active:scale-95 disabled:opacity-50"
+                  >
+                    <XCircle className="w-4 h-4" />
+                    Tolak
+                  </button>
+                </>
+              )}
+
+              {currentTab === 'awaiting_payment' && (
+                <>
+                  <button
+                    onClick={handleBulkRestore}
+                    disabled={isDeletingBulk}
+                    className="flex items-center gap-2 px-6 py-2 bg-green-500 text-white rounded-xl text-sm font-bold shadow-lg hover:bg-green-600 transition-all active:scale-95 disabled:opacity-50"
+                  >
+                    <CheckCircle className="w-4 h-4" />
+                    Publish (Pembayaran Diterima)
+                  </button>
+                  <button
+                    onClick={() => setIsConfirmingReject(true)}
+                    disabled={isDeletingBulk}
+                    className="flex items-center gap-2 px-6 py-2 bg-amber-500 text-white rounded-xl text-sm font-bold shadow-lg hover:bg-amber-600 transition-all active:scale-95 disabled:opacity-50"
+                  >
+                    <XCircle className="w-4 h-4" />
+                    Tolak Pembayaran
+                  </button>
+                </>
+              )}
+
+              {currentTab === 'rejected' && (
                 <button
-                  onClick={() => setIsConfirmingArchive(true)}
+                  onClick={handleBulkRestore}
                   disabled={isDeletingBulk}
-                  className="flex items-center gap-2 px-6 py-2 bg-[#A7C4A0] text-white rounded-xl text-sm font-bold shadow-lg hover:bg-[#8da887] transition-all active:scale-95 disabled:opacity-50"
+                  className="flex items-center gap-2 px-6 py-2 bg-green-500 text-white rounded-xl text-sm font-bold shadow-lg hover:bg-green-600 transition-all active:scale-95 disabled:opacity-50"
                 >
-                  <Archive className="w-4 h-4" />
-                  {isDeletingBulk ? "Mengarsipkan..." : "Arsipkan"}
+                  <CheckCircle className="w-4 h-4" />
+                  Pulihkan / Setujui
                 </button>
               )}
 
@@ -470,6 +728,53 @@ export default function AdminDashboard() {
       </AnimatePresence>
       {/* State Modals */}
       <AnimatePresence>
+        {/* Reject Modal */}
+        {isConfirmingReject && (
+          <motion.div 
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm"
+          >
+            <motion.div 
+              initial={{ scale: 0.95, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0.95, opacity: 0 }}
+              className="bg-white rounded-3xl p-8 max-w-md w-full shadow-2xl relative border border-white/20"
+            >
+              <div className="w-16 h-16 bg-amber-100 text-amber-500 rounded-full flex items-center justify-center mx-auto mb-6">
+                <XCircle className="w-8 h-8" />
+              </div>
+              <h3 className="text-xl font-bold text-center text-[#1F3D2B] mb-2">Tolak Pendaftaran?</h3>
+              <p className="text-center text-gray-500 mb-6 text-sm leading-relaxed">
+                Silakan berikan alasan penolakan agar pengguna bisa memperbaiki datanya.
+              </p>
+              <textarea
+                value={rejectReason}
+                onChange={(e) => setRejectReason(e.target.value)}
+                placeholder="Contoh: Foto kurang jelas, deskripsi tidak lengkap..."
+                className="w-full p-4 bg-gray-50 border-none rounded-2xl mb-8 focus:ring-2 focus:ring-[#1F3D2B]/10 text-sm resize-none h-24"
+              ></textarea>
+              <div className="flex gap-4">
+                <button 
+                  onClick={() => setIsConfirmingReject(false)}
+                  className="flex-1 px-4 py-3 bg-gray-100 text-gray-600 rounded-xl font-bold text-sm hover:bg-gray-200 transition-colors"
+                >
+                  Batal
+                </button>
+                <button 
+                  onClick={() => {
+                    setIsConfirmingReject(false);
+                    handleBulkReject();
+                  }}
+                  className="flex-1 px-4 py-3 bg-amber-500 text-white rounded-xl font-bold text-sm hover:bg-amber-600 transition-colors shadow-lg"
+                >
+                  Tolak Data
+                </button>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
         {/* Custom Archive Modal */}
         {isConfirmingArchive && (
           <motion.div 

@@ -21,6 +21,7 @@ import BusinessDetail from "./pages/Detail";
 import Upload from "./pages/Upload";
 import Login from "./pages/Login";
 import AdminDashboard from "./pages/AdminDashboard";
+import Riwayat from "./pages/Riwayat";
 
 // Components
 import Navbar from "./components/Navbar";
@@ -76,23 +77,29 @@ export default function App() {
               <Route path="/" element={<Home />} />
               <Route path="/katalog" element={<Katalog />} />
               <Route path="/bisnis/:id" element={<BusinessDetail />} />
+              <Route path="/riwayat" element={<Riwayat />} />
               
+              {/* Auth Route */}
+              <Route path="/login" element={<Login />} />
+              <Route path="/admin/login" element={<Navigate to="/login" replace />} /> {/* Deprecated route mapping */}
+
+              {/* Both Admin and User can upload, it depends on status */}
+              <Route path="/upload" element={
+                <Upload />
+              } />
+              {/* Fallback for old route */}
+              <Route path="/admin/upload" element={<Navigate to="/upload" replace />} />
+
               {/* Admin Routes */}
-              <Route path="/admin/login" element={<Login />} />
               <Route path="/admin/dashboard" element={
                 <AdminRoute>
                   <AdminDashboard />
                 </AdminRoute>
               } />
-              <Route path="/admin/upload" element={
-                <AdminRoute>
-                  <Upload />
-                </AdminRoute>
-              } />
               <Route path="/admin/edit/:id" element={
-                <AdminRoute>
+                <RequireAuth>
                   <Upload />
-                </AdminRoute>
+                </RequireAuth>
               } />
               
               {/* Fallback */}
@@ -105,6 +112,19 @@ export default function App() {
   );
 }
 
+function RequireAuth({ children }: { children: React.ReactNode }) {
+  const { user, loading } = useAuth();
+  const location = useLocation();
+  
+  if (loading) return null;
+  
+  if (!user) {
+    return <Navigate to="/login" state={{ from: location }} replace />;
+  }
+  
+  return <>{children}</>;
+}
+
 function AdminRoute({ children }: { children: React.ReactNode }) {
   const { user, isAdmin, loading } = useAuth();
   const location = useLocation();
@@ -112,7 +132,10 @@ function AdminRoute({ children }: { children: React.ReactNode }) {
   if (loading) return null;
   
   if (!user || !isAdmin) {
-    return <Navigate to="/admin/login" state={{ from: location }} replace />;
+    if (user && !isAdmin) {
+      return <Navigate to="/" replace />;
+    }
+    return <Navigate to="/login" state={{ from: location }} replace />;
   }
   
   return <>{children}</>;

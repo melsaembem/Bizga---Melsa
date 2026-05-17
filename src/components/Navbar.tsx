@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
-import { Store, Search, Home, LogOut, LayoutDashboard } from "lucide-react";
+import { Store, Search, Home, LogOut, LayoutDashboard, User as UserIcon } from "lucide-react";
 import { cn } from "../lib/utils";
 import { supabase } from "../lib/supabase";
 import { useAuth } from "../App";
@@ -8,37 +8,54 @@ import { useAuth } from "../App";
 export default function Navbar() {
   const location = useLocation();
   const navigate = useNavigate();
-  const { user } = useAuth();
+  const { user, isAdmin } = useAuth();
   
   // Stealth Admin Trigger Logic
   const [logoClicks, setLogoClicks] = useState(0);
+  const [showAdminLogin, setShowAdminLogin] = useState(false);
   const clickTimerRef = useRef<NodeJS.Timeout | null>(null);
 
-  const handleLogoClick = () => {
+  const handleLogoClick = (e: React.MouseEvent) => {
+    e.preventDefault();
+    
+    if (showAdminLogin) {
+      setShowAdminLogin(false);
+      setLogoClicks(0);
+      navigate("/");
+      return;
+    }
+
+    if (logoClicks === 0) {
+      navigate("/");
+    }
+
     setLogoClicks(prev => prev + 1);
     
     if (clickTimerRef.current) clearTimeout(clickTimerRef.current);
     
     clickTimerRef.current = setTimeout(() => {
-      setLogoClicks(0);
+      if (!showAdminLogin) setLogoClicks(0);
     }, 3000); 
   };
+
+  useEffect(() => {
+    if (logoClicks >= 3) {
+      setShowAdminLogin(true);
+      setLogoClicks(0);
+    }
+  }, [logoClicks]);
 
   const handleLogout = async () => {
     await supabase.auth.signOut();
     navigate("/");
   };
 
-  useEffect(() => {
-    if (logoClicks >= 5) {
-      setLogoClicks(0);
-      navigate("/admin/login");
-    }
-  }, [logoClicks, navigate]);
+  const dashboardPath = isAdmin ? "/admin/dashboard" : "/user/dashboard";
 
   const navLinks = [
     { name: "Beranda", path: "/", icon: Home },
     { name: "Katalog", path: "/katalog", icon: Search },
+    { name: "Riwayat", path: "/riwayat", icon: Store },
   ];
 
   return (
@@ -50,7 +67,7 @@ export default function Navbar() {
             onClick={handleLogoClick}
             className="flex items-center gap-2 group transition-all active:scale-95"
           >
-            <Store className="w-6 h-6 text-[#D4A373] group-active:animate-pulse transition-transform" />
+            <Store className="w-6 h-6 text-[#D4A373] group-hover:animate-pulse transition-transform" />
             <h1 className="text-xl font-bold tracking-tight italic select-none">Bizga</h1>
           </Link>
           
@@ -71,14 +88,23 @@ export default function Navbar() {
         </div>
 
         <div className="flex items-center gap-4">
-          {user && (
+          {showAdminLogin && !user && (
+            <Link 
+              to="/login"
+              className="hidden md:flex items-center gap-2 px-4 py-2 bg-[#D4A373] text-white hover:bg-[#c29161] rounded-xl text-xs font-bold transition-all shadow"
+            >
+              <UserIcon className="w-4 h-4" />
+              Login Admin
+            </Link>
+          )}
+          {user && isAdmin && (
             <div className="flex items-center gap-2">
               <Link 
-                to="/admin/dashboard" 
+                to={dashboardPath} 
                 className="hidden md:flex items-center gap-2 px-4 py-2 bg-white/10 hover:bg-white/20 rounded-xl text-xs font-bold transition-all"
               >
                 <LayoutDashboard className="w-4 h-4" />
-                Dashboard
+                Dashboard Admin
               </Link>
               <button 
                 onClick={handleLogout}
@@ -107,12 +133,24 @@ export default function Navbar() {
             <span className="text-[10px] font-bold uppercase tracking-widest">{link.name}</span>
           </Link>
         ))}
-        {user && (
+        {showAdminLogin && !user && (
           <Link
-            to="/admin/dashboard"
+            to="/login"
             className={cn(
               "flex flex-col items-center gap-1 transition-colors",
-              location.pathname === "/admin/dashboard" ? "text-[#1F3D2B]" : "text-gray-300"
+              location.pathname === "/login" ? "text-[#1F3D2B]" : "text-gray-300"
+            )}
+          >
+            <UserIcon className="w-5 h-5" />
+            <span className="text-[10px] font-bold uppercase tracking-widest">Login</span>
+          </Link>
+        )}
+        {user && isAdmin && (
+          <Link
+            to={dashboardPath}
+            className={cn(
+              "flex flex-col items-center gap-1 transition-colors",
+              location.pathname.includes("dashboard") ? "text-[#1F3D2B]" : "text-gray-300"
             )}
           >
             <LayoutDashboard className="w-5 h-5" />

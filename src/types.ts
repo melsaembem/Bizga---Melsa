@@ -25,7 +25,9 @@ export interface Business {
   ownerId: string;
   rating: number;
   reviewCount: number;
-  status: 'active' | 'archived';
+  status: 'active' | 'archived' | 'pending' | 'rejected' | 'awaiting_payment';
+  rejection_reason?: string;
+  last_payment_date?: string;
   createdAt: any;
   updatedAt: any;
 }
