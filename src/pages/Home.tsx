@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { supabase } from "../lib/supabase";
 import { Business, CATEGORIES } from "../types";
+import { cn } from "../lib/utils";
 import BusinessCard from "../components/BusinessCard";
 import RegisterWAButton from "../components/RegisterWAButton";
 import { Sparkles, ArrowRight, TrendingUp, Users, Store } from "lucide-react";
@@ -50,31 +51,31 @@ export default function Home() {
   return (
     <div className="space-y-12 pb-24">
       {/* Hero Section */}
-      <section className="relative bg-[#1F3D2B] text-white overflow-hidden w-full pt-20 pb-32 md:pt-32 md:pb-48 flex flex-col items-center text-center">
+      <section className="relative bg-soft-pink-100 text-soft-pink-800 overflow-hidden w-full pt-20 pb-32 md:pt-32 md:pb-48 flex flex-col items-center text-center">
         {/* Background decorative elements */}
-        <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-[#D4A373] opacity-5 rounded-full blur-[120px] -mr-64 -mt-64"></div>
-        <div className="absolute bottom-0 left-0 w-[500px] h-[500px] bg-[#A7C4A0] opacity-5 rounded-full blur-[120px] -ml-64 -mb-64"></div>
+        <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-soft-yellow-100 opacity-40 rounded-full blur-[120px] -mr-64 -mt-64"></div>
+        <div className="absolute bottom-0 left-0 w-[500px] h-[500px] bg-soft-pink-300 opacity-40 rounded-full blur-[120px] -ml-64 -mb-64"></div>
 
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           className="relative z-10 max-w-4xl px-6"
         >
-          <span className="inline-block px-4 py-1.5 bg-[#D4A373]/20 text-[#D4A373] text-[10px] font-bold rounded-full mb-8 uppercase tracking-[0.2em] border border-[#D4A373]/30">
+          <span className="inline-block px-4 py-1.5 bg-soft-pink-50 text-soft-pink-800 text-[10px] font-bold rounded-full mb-8 uppercase tracking-[0.2em] border border-soft-pink-800/10">
             Komunitas Lokal Terpercaya
           </span>
           <h1 className="text-5xl md:text-8xl font-bold mb-8 leading-[1.1] tracking-tight">
             Cari Jasa & Produk <br className="hidden md:block" /> 
-            <span className="text-[#D4A373]">Tetangga Duren Sawit</span>
+            <span className="text-soft-pink-800/60">Tetangga Duren Sawit</span>
           </h1>
-          <p className="text-[#A7C4A0] text-xl mb-12 max-w-2xl mx-auto leading-relaxed font-medium">
-            Membantu warga sekitar mempromosikan UMKM mereka dengan elegan. <br className="hidden md:block" /> Sederhana, cepat, dan terintegrasi langsung dengan WhatsApp.
+          <p className="text-pastel-pink-dark/70 text-xl mb-12 max-w-2xl mx-auto leading-relaxed font-medium">
+            Wadah elegan untuk memajukan kejayaan UMKM warga sekitar. <br className="hidden md:block" /> Promosi instan, profesional, dan langsung terhubung ke WhatsApp tetangga.
           </p>
           
           <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
             <Link 
               to="/katalog" 
-              className="bg-white text-[#1F3D2B] font-bold py-4 px-10 rounded-full shadow-xl hover:scale-105 transition-transform flex items-center justify-center gap-2 group w-full sm:w-auto"
+              className="bg-white text-pastel-pink-dark font-bold py-4 px-10 rounded-full shadow-lg hover:scale-105 transition-transform flex items-center justify-center gap-2 group w-full sm:w-auto"
             >
               Lihat Katalog
               <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
@@ -92,7 +93,7 @@ export default function Home() {
               <h2 className="text-2xl font-bold text-[#1A1A1A]">Kategori Pilihan</h2>
               <p className="text-sm text-gray-400">Temukan apa yang Anda butuhkan</p>
             </div>
-            <Link to="/katalog" className="text-[#D4A373] font-bold text-sm flex items-center gap-1 group">
+            <Link to="/katalog" className="text-soft-pink-800 font-bold text-sm flex items-center gap-1 group">
               Lihat Semua <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
             </Link>
           </div>
@@ -102,12 +103,15 @@ export default function Home() {
               <Link 
                 key={cat}
                 to={`/katalog?cat=${cat}`}
-                className="bg-white p-4 rounded-2xl border border-black/5 flex flex-col items-center text-center gap-3 hover:border-[#D4A373] hover:shadow-md transition-all group"
+                className="bg-white p-4 rounded-2xl border border-black/5 flex flex-col items-center text-center gap-3 hover:border-soft-pink-200 hover:shadow-md transition-all group"
               >
-                <div className="w-12 h-12 bg-[#F5F5F5] rounded-full flex items-center justify-center group-hover:bg-[#A7C4A0]/20 transition-colors">
-                  <Store className="w-6 h-6 text-[#1F3D2B]" />
+                <div className={cn(
+                  "w-12 h-12 rounded-full flex items-center justify-center transition-colors",
+                  i % 2 === 0 ? "bg-soft-pink-50 group-hover:bg-soft-pink-100" : "bg-soft-yellow-50 group-hover:bg-soft-yellow-100"
+                )}>
+                  <Store className="w-6 h-6 text-soft-pink-800" />
                 </div>
-                <span className="text-xs font-bold text-gray-600 group-hover:text-[#1F3D2B]">{cat}</span>
+                <span className="text-xs font-bold text-gray-600 group-hover:text-soft-pink-800">{cat}</span>
               </Link>
             ))}
           </div>

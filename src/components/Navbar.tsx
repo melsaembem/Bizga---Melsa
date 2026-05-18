@@ -60,14 +60,14 @@ export default function Navbar() {
 
   return (
     <>
-      <nav className="fixed top-0 left-0 right-0 z-50 bg-[#1F3D2B] text-white px-6 h-16 shadow-md flex justify-between items-center">
+      <nav className="fixed top-0 left-0 right-0 z-50 bg-soft-pink-50 text-soft-pink-800 px-6 h-16 shadow-sm flex justify-between items-center border-b border-soft-pink-100">
         <div className="flex items-center gap-6">
           <Link 
             to="/" 
             onClick={handleLogoClick}
             className="flex items-center gap-2 group transition-all active:scale-95"
           >
-            <Store className="w-6 h-6 text-[#D4A373] group-hover:animate-pulse transition-transform" />
+            <Store className="w-7 h-7 text-soft-pink-200 group-hover:text-soft-blue-200 group-hover:scale-110 transition-all duration-300" />
             <h1 className="text-xl font-bold tracking-tight italic select-none">Bizga</h1>
           </Link>
           
@@ -77,8 +77,8 @@ export default function Navbar() {
                 key={link.path}
                 to={link.path}
                 className={cn(
-                  "text-sm font-bold transition-colors hover:text-[#D4A373]",
-                  location.pathname === link.path ? "text-[#D4A373]" : "text-white/70"
+                  "text-sm font-bold transition-colors hover:text-pastel-pink-dark",
+                  location.pathname === link.path ? "text-pastel-pink-dark" : "text-soft-pink-800/70"
                 )}
               >
                 {link.name}
@@ -91,7 +91,7 @@ export default function Navbar() {
           {showAdminLogin && !user && (
             <Link 
               to="/login"
-              className="hidden md:flex items-center gap-2 px-4 py-2 bg-[#D4A373] text-white hover:bg-[#c29161] rounded-xl text-xs font-bold transition-all shadow"
+              className="hidden md:flex items-center gap-2 px-4 py-2 bg-pastel-pink text-pastel-pink-dark hover:bg-pastel-pink/80 rounded-xl text-xs font-bold transition-all shadow-sm"
             >
               <UserIcon className="w-4 h-4" />
               Login Admin
@@ -101,14 +101,14 @@ export default function Navbar() {
             <div className="flex items-center gap-2">
               <Link 
                 to={dashboardPath} 
-                className="hidden md:flex items-center gap-2 px-4 py-2 bg-white/10 hover:bg-white/20 rounded-xl text-xs font-bold transition-all"
+                className="hidden md:flex items-center gap-2 px-4 py-2 bg-white/40 hover:bg-white/60 text-soft-pink-800 rounded-xl text-xs font-bold transition-all"
               >
                 <LayoutDashboard className="w-4 h-4" />
                 Dashboard Admin
               </Link>
               <button 
                 onClick={handleLogout}
-                className="p-2 text-white/50 hover:text-white transition-colors"
+                className="p-2 text-soft-pink-800/50 hover:text-soft-pink-800 transition-colors"
                 title="Logout"
               >
                 <LogOut className="w-4 h-4" />
@@ -126,7 +126,7 @@ export default function Navbar() {
             to={link.path}
             className={cn(
               "flex flex-col items-center gap-1 transition-colors",
-              location.pathname === link.path ? "text-[#1F3D2B]" : "text-gray-300"
+              location.pathname === link.path ? "text-soft-pink-800" : "text-gray-300"
             )}
           >
             <link.icon className="w-5 h-5" />
@@ -138,7 +138,7 @@ export default function Navbar() {
             to="/login"
             className={cn(
               "flex flex-col items-center gap-1 transition-colors",
-              location.pathname === "/login" ? "text-[#1F3D2B]" : "text-gray-300"
+              location.pathname === "/login" ? "text-soft-pink-800" : "text-gray-300"
             )}
           >
             <UserIcon className="w-5 h-5" />
@@ -150,7 +150,7 @@ export default function Navbar() {
             to={dashboardPath}
             className={cn(
               "flex flex-col items-center gap-1 transition-colors",
-              location.pathname.includes("dashboard") ? "text-[#1F3D2B]" : "text-gray-300"
+              location.pathname.includes("dashboard") ? "text-soft-pink-800" : "text-gray-300"
             )}
           >
             <LayoutDashboard className="w-5 h-5" />

@@ -49,7 +49,7 @@ export default function Riwayat() {
   if (loading) {
     return (
       <div className="min-h-screen pt-20 flex flex-col items-center justify-center">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#1F3D2B]"></div>
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-soft-pink-800"></div>
         <p className="mt-4 text-gray-500 font-medium">Memuat Riwayat...</p>
       </div>
     );
@@ -58,22 +58,22 @@ export default function Riwayat() {
   return (
     <div className="max-w-5xl mx-auto px-6 py-12 min-h-screen">
       <div className="mb-10">
-        <h1 className="text-3xl font-bold text-[#1F3D2B] mb-2">Riwayat Pendaftaran</h1>
+        <h1 className="text-3xl font-bold text-soft-pink-800 mb-2">Riwayat Pendaftaran</h1>
         <p className="text-gray-500">Pantau status persetujuan usaha yang Anda daftarkan di sini.</p>
       </div>
 
       {businesses.length === 0 ? (
         <div className="bg-white rounded-3xl p-12 text-center shadow-sm border border-gray-100 flex flex-col items-center">
-          <div className="w-20 h-20 bg-gray-50 rounded-full flex items-center justify-center mb-6 text-gray-300">
+          <div className="w-20 h-20 bg-soft-pink-50 rounded-full flex items-center justify-center mb-6 text-soft-pink-800">
             <Store className="w-10 h-10" />
           </div>
-          <h3 className="text-xl font-bold text-[#1F3D2B] mb-2">Belum Ada Riwayat</h3>
+          <h3 className="text-xl font-bold text-soft-pink-800 mb-2">Belum Ada Riwayat</h3>
           <p className="text-gray-500 mb-8 max-w-md mx-auto">
             Anda belum pernah mendaftarkan usaha di perangkat ini. Yuk daftarkan usaha Anda sekarang!
           </p>
           <Link 
             to="/upload"
-            className="px-8 py-3 bg-[#D4A373] text-white rounded-xl font-bold shadow-lg hover:bg-[#c29161] transition-all"
+            className="px-8 py-3 bg-pastel-pink text-pastel-pink-dark rounded-xl font-bold shadow-lg hover:bg-pastel-pink/80 transition-all"
           >
             Daftarkan Usaha
           </Link>
@@ -96,7 +96,7 @@ export default function Riwayat() {
                 />
                 <div className="absolute top-4 left-4">
                   {business.status === 'active' && (
-                    <span className="flex items-center gap-1.5 px-3 py-1.5 bg-green-500/90 backdrop-blur text-white text-xs font-bold rounded-lg shadow-lg">
+                    <span className="flex items-center gap-1.5 px-3 py-1.5 bg-soft-green-50/90 backdrop-blur text-soft-green-700 text-xs font-bold rounded-lg shadow-sm border border-soft-green-100">
                       <CheckCircle className="w-3.5 h-3.5" /> Telah Tayang
                     </span>
                   )}
@@ -111,17 +111,17 @@ export default function Riwayat() {
                     </span>
                   )}
                   {business.status === 'rejected' && (
-                    <span className="flex items-center gap-1.5 px-3 py-1.5 bg-red-500/90 backdrop-blur text-white text-xs font-bold rounded-lg shadow-lg">
+                    <span className="flex items-center gap-1.5 px-3 py-1.5 bg-soft-red-50/90 backdrop-blur text-soft-red-600 text-xs font-bold rounded-lg shadow-sm border border-soft-red-100">
                       <XCircle className="w-3.5 h-3.5" /> Ditolak / Revisi
                     </span>
                   )}
                 </div>
               </div>
               <div className="p-6 flex-1 flex flex-col">
-                <div className="inline-block px-2 py-1 bg-gray-100 text-gray-600 rounded text-[10px] font-bold uppercase tracking-widest w-fit mb-3">
+                <div className="inline-block px-2 py-1 bg-soft-pink-50 text-soft-pink-800 rounded text-[10px] font-bold uppercase tracking-widest w-fit mb-3">
                   {business.category}
                 </div>
-                <h3 className="font-bold text-lg text-[#1F3D2B] mb-2">{business.name}</h3>
+                <h3 className="font-bold text-lg text-soft-pink-800 mb-2">{business.name}</h3>
                 
                 {business.status === 'rejected' && business.rejection_reason && (
                   <div className="mt-2 mb-4 p-3 bg-red-50 text-red-700/80 rounded-xl text-xs border border-red-100">
@@ -159,7 +159,7 @@ export default function Riwayat() {
                       href={`https://wa.me/6281234567890?text=Halo%20Admin,%20saya%20ingin%20konfirmasi%20pembayaran%20awal%20katalog%20untuk%20usaha%20${business.name}`}
                       target="_blank"
                       rel="noreferrer"
-                      className="w-full flex items-center justify-center gap-2 py-2 bg-[#25D366] text-white text-xs font-bold rounded-lg shadow hover:bg-[#1ebd5a] transition-all"
+                      className="w-full flex items-center justify-center gap-2 py-2 bg-soft-green-50 text-soft-green-700 text-xs font-bold rounded-lg border border-soft-green-100 hover:bg-soft-green-100 transition-all"
                     >
                       <MessageCircle className="w-4 h-4" />
                       Konfirmasi via WhatsApp
@@ -198,7 +198,7 @@ export default function Riwayat() {
                       href={`https://wa.me/6281234567890?text=Halo%20Admin,%20saya%20ingin%20konfirmasi%20pembayaran%20sewa%20bulanan%20katalog%20Bizga%20untuk%20usaha%20${business.name}`}
                       target="_blank"
                       rel="noreferrer"
-                      className="w-full flex items-center justify-center gap-2 py-2 bg-[#25D366] text-white text-xs font-bold rounded-lg shadow hover:bg-[#1ebd5a] transition-all"
+                      className="w-full flex items-center justify-center gap-2 py-2 bg-soft-green-50 text-soft-green-700 text-xs font-bold rounded-lg border border-soft-green-100 hover:bg-soft-green-100 transition-all"
                     >
                       <MessageCircle className="w-4 h-4" />
                       Konfirmasi via WhatsApp
@@ -209,14 +209,14 @@ export default function Riwayat() {
                 <div className="mt-auto pt-4 border-t border-gray-100 flex gap-2">
                   <button 
                     onClick={() => navigate(`/upload?edit=${business.id}`)} // Note: We might need to allow unauthenticated edits for their own items?
-                    className="flex-1 py-2 text-center border-2 border-[#1F3D2B] text-[#1F3D2B] text-xs font-bold rounded-xl hover:bg-[#1F3D2B]/5 transition-colors"
+                    className="flex-1 py-2 text-center border-2 border-soft-pink-800 text-soft-pink-800 text-xs font-bold rounded-xl hover:bg-soft-pink-50 transition-colors"
                   >
                     Detail/Edit
                   </button>
                   {business.status === 'active' && (
                     <Link 
                       to={`/bisnis/${business.id}`}
-                      className="flex-1 py-2 text-center bg-[#F5F5F5] text-[#1F3D2B] text-xs font-bold rounded-xl hover:bg-gray-200 transition-colors"
+                      className="flex-1 py-2 text-center bg-soft-pink-100 text-soft-pink-800 text-xs font-bold rounded-xl hover:bg-soft-pink-200 transition-colors"
                     >
                       Lihat Tayang
                     </Link>
@@ -241,7 +241,7 @@ export default function Riwayat() {
             >
               <XCircle className="w-6 h-6" />
             </button>
-            <h3 className="text-lg font-bold text-[#1F3D2B] mb-4">Scan QRIS</h3>
+            <h3 className="text-lg font-bold text-soft-pink-800 mb-4">Scan QRIS</h3>
             <div className="w-full aspect-square rounded-2xl overflow-hidden bg-gray-50 flex items-center justify-center p-4 border-2 border-gray-100">
                {qrisImage ? (
                  <img src={qrisImage} alt="QRIS" className="w-full h-full object-contain" />

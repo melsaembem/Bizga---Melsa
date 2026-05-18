@@ -327,12 +327,12 @@ export default function AdminDashboard() {
     <div className="px-6 py-12 max-w-7xl mx-auto space-y-8">
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
         <div>
-          <div className="flex items-center gap-2 text-[#D4A373] mb-1">
+          <div className="flex items-center gap-2 text-pastel-pink-dark mb-1">
             <ShieldCheck className="w-5 h-5" />
             <span className="text-xs font-bold uppercase tracking-widest">Admin Control Panel</span>
           </div>
           <div className="flex items-center gap-4">
-            <h1 className="text-3xl font-bold text-[#1F3D2B]">
+            <h1 className="text-3xl font-bold text-soft-pink-800">
               Moderasi Katalog
             </h1>
           </div>
@@ -341,7 +341,7 @@ export default function AdminDashboard() {
         <div className="flex gap-4 w-full md:w-auto">
           <Link
             to="/upload"
-            className="bg-[#1F3D2B] text-white px-6 py-2 rounded-xl text-sm font-bold shadow-lg hover:bg-[#D4A373] transition-all flex items-center gap-2"
+            className="bg-soft-pink-100 text-soft-pink-800 px-6 py-2 rounded-xl text-sm font-bold shadow-lg hover:bg-soft-pink-200 transition-all flex items-center gap-2"
           >
             Tambah Usaha
           </Link>
@@ -352,7 +352,7 @@ export default function AdminDashboard() {
               placeholder="Cari usaha..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="w-full pl-10 pr-4 py-2 bg-white border border-black/5 rounded-xl text-sm focus:ring-2 focus:ring-[#1F3D2B]/10"
+              className="w-full pl-10 pr-4 py-2 bg-white border border-black/5 rounded-xl text-sm focus:ring-2 focus:ring-soft-pink-100"
             />
           </div>
         </div>
@@ -361,34 +361,34 @@ export default function AdminDashboard() {
       {/* Admin Stats */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         <div className="bg-white p-6 rounded-3xl border border-black/5 flex items-center gap-4">
-          <div className="p-3 bg-[#1F3D2B]/5 rounded-2xl text-[#1F3D2B]">
+          <div className="p-3 bg-soft-pink-50 rounded-2xl text-soft-pink-800">
             <Building2 className="w-6 h-6" />
           </div>
           <div>
             <p className="text-xs font-bold text-gray-400 uppercase">
               {isSuperAdmin ? "Total Aktif" : "Usaha Saya"}
             </p>
-            <p className="text-2xl font-black text-[#1F3D2B]">{businesses.filter(b => b.status === 'active').length}</p>
+            <p className="text-2xl font-black text-soft-pink-800">{businesses.filter(b => b.status === 'active').length}</p>
           </div>
         </div>
         <div className="bg-white p-6 rounded-3xl border border-black/5 flex items-center gap-4">
-          <div className="p-3 bg-[#D4A373]/5 rounded-2xl text-[#D4A373]">
+          <div className="p-3 bg-soft-yellow-50 rounded-2xl text-soft-yellow-800">
             <Archive className="w-6 h-6" />
           </div>
           <div>
             <p className="text-xs font-bold text-gray-400 uppercase">Total Arsip</p>
-            <p className="text-2xl font-black text-[#1F3D2B]">
+            <p className="text-2xl font-black text-soft-pink-800">
               {businesses.filter(b => b.status === 'archived').length}
             </p>
           </div>
         </div>
         <div className="bg-white p-6 rounded-3xl border border-black/5 flex items-center gap-4">
-          <div className="p-3 bg-[#A7C4A0]/5 rounded-2xl text-[#A7C4A0]">
+          <div className="p-3 bg-soft-pink-100 rounded-2xl text-soft-pink-700">
             <BarChart3 className="w-6 h-6" />
           </div>
           <div>
             <p className="text-xs font-bold text-gray-400 uppercase">Status Sistem</p>
-            <p className="text-sm font-bold text-[#A7C4A0]">AKTIF & AMAN</p>
+            <p className="text-sm font-bold text-soft-pink-700 uppercase">Aktif & Aman</p>
           </div>
         </div>
       </div>
@@ -400,7 +400,7 @@ export default function AdminDashboard() {
           className={cn(
             "pb-4 px-2 text-sm font-bold transition-all border-b-2 whitespace-nowrap",
             currentTab === 'active'
-              ? "text-[#1F3D2B] border-[#1F3D2B]"
+              ? "text-soft-pink-800 border-soft-pink-800"
               : "text-gray-400 border-transparent hover:text-gray-600"
           )}
         >
@@ -433,7 +433,7 @@ export default function AdminDashboard() {
           className={cn(
             "pb-4 px-2 text-sm font-bold transition-all border-b-2 whitespace-nowrap",
             currentTab === 'rejected'
-              ? "text-red-500 border-red-500"
+              ? "text-soft-red-600 border-soft-red-600"
               : "text-gray-400 border-transparent hover:text-gray-600"
           )}
         >
@@ -444,7 +444,7 @@ export default function AdminDashboard() {
           className={cn(
             "pb-4 px-2 text-sm font-bold transition-all border-b-2 whitespace-nowrap",
             currentTab === 'archived'
-              ? "text-[#1F3D2B] border-[#1F3D2B]"
+              ? "text-soft-pink-800 border-soft-pink-800"
               : "text-gray-400 border-transparent hover:text-gray-600"
           )}
         >
@@ -455,7 +455,7 @@ export default function AdminDashboard() {
           className={cn(
             "pb-4 px-2 text-sm font-bold transition-all border-b-2 whitespace-nowrap",
             currentTab === 'settings'
-              ? "text-[#1F3D2B] border-[#1F3D2B]"
+              ? "text-soft-pink-800 border-soft-pink-800"
               : "text-gray-400 border-transparent hover:text-gray-600"
           )}
         >
@@ -500,7 +500,7 @@ export default function AdminDashboard() {
                   <td className="px-6 py-4">
                     <input
                       type="checkbox"
-                      className="rounded border-gray-300 text-[#1F3D2B] focus:ring-[#1F3D2B]"
+                      className="rounded border-gray-300 text-soft-pink-800 focus:ring-soft-pink-800 cursor-pointer"
                       checked={selectedIds.includes(b.id)}
                       onChange={() => toggleSelect(b.id)}
                     />
@@ -509,19 +509,19 @@ export default function AdminDashboard() {
                     <div className="flex items-center gap-3">
                       <img src={b.photoURL} alt="" className="w-10 h-10 rounded-lg object-cover" />
                       <div>
-                        <p className="font-bold text-sm text-[#1F3D2B]">{b.name}</p>
+                        <p className="font-bold text-sm text-soft-pink-800">{b.name}</p>
                         <p className="text-[10px] text-gray-400">{new Date(b.createdAt).toLocaleDateString()}</p>
                       </div>
                     </div>
                   </td>
                   <td className="px-6 py-4">
-                    <span className="text-[10px] bg-[#F5F5F5] px-2 py-1 rounded-full font-bold text-gray-500">{b.category}</span>
+                    <span className="text-[10px] bg-soft-pink-50 px-2 py-1 rounded-full font-bold text-gray-500">{b.category}</span>
                   </td>
                   <td className="px-6 py-4">
                     <p className="text-xs font-medium">{b.whatsapp}</p>
                   </td>
                   <td className="px-6 py-4">
-                    <p className="text-xs font-bold text-[#1F3D2B]">{b.price || '-'}</p>
+                    <p className="text-xs font-bold text-soft-pink-800">{b.price || '-'}</p>
                   </td>
                   <td className="px-6 py-4">
                     <p className="text-xs font-medium">RT {b.rt} / RW {b.rw}</p>
@@ -529,7 +529,7 @@ export default function AdminDashboard() {
                   {currentTab === 'active' && (
                   <td className="px-6 py-4">
                     {isPaidThisMonth ? (
-                      <span className="text-[10px] font-bold text-green-600 bg-green-50 px-2 py-1 rounded-md">Lunas Bulan Ini</span>
+                      <span className="text-[10px] font-bold text-soft-green-700 bg-soft-green-50 px-2 py-1 rounded-md">Lunas Bulan Ini</span>
                     ) : (
                       <span className="text-[10px] font-bold text-amber-600 bg-amber-50 px-2 py-1 rounded-md">Belum Lunas</span>
                     )}
@@ -539,7 +539,7 @@ export default function AdminDashboard() {
                     <div className="flex justify-end gap-2">
                       <button
                         onClick={() => handleShare(b)}
-                        className="p-2 text-gray-400 hover:text-green-600 transition-colors"
+                        className="p-2 text-gray-400 hover:text-soft-green-700 transition-colors"
                         title="Bagikan"
                       >
                         <Share2 className="w-4 h-4" />
@@ -553,7 +553,7 @@ export default function AdminDashboard() {
                       </Link>
                       <Link
                         to={`/bisnis/${b.id}`}
-                        className="p-2 text-gray-400 hover:text-[#D4A373] transition-colors"
+                        className="p-2 text-gray-400 hover:text-soft-pink-800 transition-colors"
                         title="Lihat"
                       >
                         <ExternalLink className="w-4 h-4" />
@@ -574,21 +574,21 @@ export default function AdminDashboard() {
       </div>
       ) : (
         <div className="bg-white rounded-3xl shadow-sm border border-black/5 p-8 max-w-xl">
-          <h2 className="text-xl font-bold text-[#1F3D2B] mb-6">Pengaturan Pembayaran (QRIS)</h2>
+          <h2 className="text-xl font-bold text-soft-pink-800 mb-6">Pengaturan Pembayaran (QRIS)</h2>
           <div className="space-y-4">
             <p className="text-sm text-gray-500">
               Upload foto/gambar QRIS Admin. Gambar ini akan ditampilkan di halaman Riwayat pendafar untuk mereka melakukan pembayaran sewa bulanan.
             </p>
             
             {qrisImage && (
-              <div className="w-48 h-48 rounded-xl overflow-hidden border-2 border-gray-200">
+              <div className="w-48 h-48 rounded-xl overflow-hidden border-2 border-pastel-pink/20">
                 <img src={qrisImage} alt="QRIS" className="w-full h-full object-cover" />
               </div>
             )}
             
             <div className="mt-4">
               <label className="inline-block">
-                <span className="px-6 py-3 bg-[#D4A373] text-white text-sm font-bold rounded-xl cursor-pointer hover:bg-[#c29161] transition-colors flex items-center justify-center">
+                <span className="px-6 py-3 bg-pastel-pink text-pastel-pink-dark text-sm font-bold rounded-xl cursor-pointer hover:bg-pastel-pink/80 transition-colors flex items-center justify-center">
                   {isUploadingQris ? "Mengupload..." : "Upload Gambar QRIS"}
                 </span>
                 <input 
@@ -611,19 +611,19 @@ export default function AdminDashboard() {
             initial={{ y: 100, opacity: 0 }}
             animate={{ y: 0, opacity: 1 }}
             exit={{ y: 100, opacity: 0 }}
-            className="fixed bottom-8 left-1/2 -translate-x-1/2 z-50 bg-[#1F3D2B] text-white px-8 py-4 rounded-2xl shadow-2xl flex items-center gap-8 border border-white/10"
+            className="fixed bottom-8 left-1/2 -translate-x-1/2 z-50 bg-soft-pink-50 text-soft-pink-800 px-8 py-4 rounded-2xl shadow-2xl flex items-center gap-8 border border-soft-pink-200"
           >
             <div className="flex flex-col">
               <span className="text-[10px] font-black uppercase tracking-[0.2em] opacity-60">Terpilih</span>
               <span className="text-xl font-black">{selectedIds.length} Usaha</span>
             </div>
 
-            <div className="h-8 w-px bg-white/10"></div>
+            <div className="h-8 w-px bg-soft-pink-800/10"></div>
 
             <div className="flex gap-3">
               <button
                 onClick={() => setSelectedIds([])}
-                className="px-4 py-2 rounded-xl text-sm font-bold border border-white/20 hover:bg-white/5 transition-colors"
+                className="px-4 py-2 rounded-xl text-sm font-bold border border-soft-pink-800/20 hover:bg-soft-pink-800/5 transition-colors"
                 disabled={isDeletingBulk}
               >
                 Batal
@@ -632,7 +632,7 @@ export default function AdminDashboard() {
               <button
                 onClick={() => setIsConfirmingDelete(true)}
                 disabled={isDeletingBulk}
-                className="flex items-center gap-2 px-6 py-2 bg-red-500 text-white rounded-xl text-sm font-bold shadow-lg hover:bg-red-600 transition-all active:scale-95 disabled:opacity-50"
+                className="flex items-center gap-2 px-6 py-2 bg-soft-red-50 text-soft-red-600 rounded-xl text-sm font-bold shadow-sm border border-soft-red-100 hover:bg-soft-red-100 transition-all active:scale-95 disabled:opacity-50"
               >
                 <Trash2 className="w-4 h-4" />
                 {isDeletingBulk ? "Menghapus..." : "Hapus"}
@@ -685,7 +685,7 @@ export default function AdminDashboard() {
                   <button
                     onClick={handleBulkRestore}
                     disabled={isDeletingBulk}
-                    className="flex items-center gap-2 px-6 py-2 bg-green-500 text-white rounded-xl text-sm font-bold shadow-lg hover:bg-green-600 transition-all active:scale-95 disabled:opacity-50"
+                    className="flex items-center gap-2 px-6 py-2 bg-soft-green-100 text-soft-green-700 rounded-xl text-sm font-bold shadow-sm transition-all active:scale-95 disabled:opacity-50"
                   >
                     <CheckCircle className="w-4 h-4" />
                     Publish (Pembayaran Diterima)
@@ -705,7 +705,7 @@ export default function AdminDashboard() {
                 <button
                   onClick={handleBulkRestore}
                   disabled={isDeletingBulk}
-                  className="flex items-center gap-2 px-6 py-2 bg-green-500 text-white rounded-xl text-sm font-bold shadow-lg hover:bg-green-600 transition-all active:scale-95 disabled:opacity-50"
+                  className="flex items-center gap-2 px-6 py-2 bg-soft-green-100 text-soft-green-700 rounded-xl text-sm font-bold shadow-sm transition-all active:scale-95 disabled:opacity-50"
                 >
                   <CheckCircle className="w-4 h-4" />
                   Pulihkan / Setujui
@@ -714,9 +714,9 @@ export default function AdminDashboard() {
 
               {currentTab === 'archived' && (
                 <button
-                  onClick={handleBulkRestore}
-                  disabled={isDeletingBulk}
-                  className="flex items-center gap-2 px-6 py-2 bg-[#D4A373] text-white rounded-xl text-sm font-bold shadow-lg hover:bg-[#c49363] transition-all active:scale-95 disabled:opacity-50"
+                   onClick={handleBulkRestore}
+                   disabled={isDeletingBulk}
+                   className="flex items-center gap-2 px-6 py-2 bg-soft-pink-100 text-soft-pink-800 rounded-xl text-sm font-bold shadow-lg hover:bg-soft-pink-200 transition-all active:scale-95 disabled:opacity-50"
                 >
                   <RotateCcw className="w-4 h-4" />
                   {isDeletingBulk ? "Memulihkan..." : "Pulihkan"}
@@ -745,7 +745,7 @@ export default function AdminDashboard() {
               <div className="w-16 h-16 bg-amber-100 text-amber-500 rounded-full flex items-center justify-center mx-auto mb-6">
                 <XCircle className="w-8 h-8" />
               </div>
-              <h3 className="text-xl font-bold text-center text-[#1F3D2B] mb-2">Tolak Pendaftaran?</h3>
+              <h3 className="text-xl font-bold text-center text-soft-pink-800 mb-2">Tolak Pendaftaran?</h3>
               <p className="text-center text-gray-500 mb-6 text-sm leading-relaxed">
                 Silakan berikan alasan penolakan agar pengguna bisa memperbaiki datanya.
               </p>
@@ -753,7 +753,7 @@ export default function AdminDashboard() {
                 value={rejectReason}
                 onChange={(e) => setRejectReason(e.target.value)}
                 placeholder="Contoh: Foto kurang jelas, deskripsi tidak lengkap..."
-                className="w-full p-4 bg-gray-50 border-none rounded-2xl mb-8 focus:ring-2 focus:ring-[#1F3D2B]/10 text-sm resize-none h-24"
+                className="w-full p-4 bg-soft-pink-50/50 border-none rounded-2xl mb-8 focus:ring-2 focus:ring-soft-pink-200 text-sm resize-none h-24"
               ></textarea>
               <div className="flex gap-4">
                 <button 
@@ -792,7 +792,7 @@ export default function AdminDashboard() {
               <div className="w-16 h-16 bg-[#A7C4A0]/20 text-[#A7C4A0] rounded-full flex items-center justify-center mx-auto mb-6">
                 <Archive className="w-8 h-8" />
               </div>
-              <h3 className="text-xl font-bold text-center text-[#1F3D2B] mb-2">Arsipkan Data?</h3>
+              <h3 className="text-xl font-bold text-center text-soft-pink-800 mb-2">Arsipkan Data?</h3>
               <p className="text-center text-gray-500 mb-8 text-sm leading-relaxed">
                 Yakin ingin mengarsipkan <b>{selectedIds.length} data</b>? Data akan dipindahkan ke tab Arsip dan tidak muncul di katalog publik.
               </p>
@@ -808,7 +808,7 @@ export default function AdminDashboard() {
                     setIsConfirmingArchive(false);
                     handleBulkArchive();
                   }}
-                  className="flex-1 px-4 py-3 bg-[#1F3D2B] text-white rounded-xl font-bold text-sm hover:bg-[#1F3D2B]/90 transition-colors shadow-lg"
+                  className="flex-1 px-4 py-3 bg-pastel-pink text-pastel-pink-dark rounded-xl font-bold text-sm hover:bg-pastel-pink/80 transition-colors shadow-lg"
                 >
                   Ya, Arsipkan
                 </button>
@@ -831,10 +831,10 @@ export default function AdminDashboard() {
               exit={{ scale: 0.95, opacity: 0 }}
               className="bg-white rounded-3xl p-8 max-w-sm w-full shadow-2xl relative border border-white/20"
             >
-              <div className="w-16 h-16 bg-red-100 text-red-500 rounded-full flex items-center justify-center mx-auto mb-6">
+              <div className="w-16 h-16 bg-soft-red-50 text-soft-red-600 rounded-full flex items-center justify-center mx-auto mb-6">
                 <Trash2 className="w-8 h-8" />
               </div>
-              <h3 className="text-xl font-bold text-center text-[#1F3D2B] mb-2">Hapus Permanen?</h3>
+              <h3 className="text-xl font-bold text-center text-soft-pink-800 mb-2">Hapus Permanen?</h3>
               <p className="text-center text-gray-500 mb-8 text-sm leading-relaxed">
                 Yakin ingin menghapus <b>{selectedIds.length} data</b> secara permanen? Data akan terhapus dari sistem sepenuhnya dan tidak bisa dibatalkan.
               </p>
@@ -850,7 +850,7 @@ export default function AdminDashboard() {
                     setIsConfirmingDelete(false);
                     handleBulkAction();
                   }}
-                  className="flex-1 px-4 py-3 bg-red-500 text-white rounded-xl font-bold text-sm hover:bg-red-600 transition-colors shadow-lg shadow-red-500/30"
+                  className="flex-1 px-4 py-3 bg-soft-red-100 text-soft-red-600 rounded-xl font-bold text-sm hover:bg-soft-red-200 transition-colors shadow-sm"
                 >
                   Ya, Hapus
                 </button>
@@ -870,11 +870,11 @@ export default function AdminDashboard() {
             <div className="bg-white rounded-2xl p-6 max-w-sm w-full shadow-2xl">
               <div className={cn(
                 "w-12 h-12 rounded-full flex items-center justify-center mx-auto mb-4",
-                notification.type === 'success' ? "bg-green-100 text-green-600" : "bg-red-100 text-red-500"
+                notification.type === 'success' ? "bg-soft-green-50 text-soft-green-700" : "bg-soft-red-50 text-soft-red-600"
               )}>
                 {notification.type === 'success' ? <ShieldCheck className="w-6 h-6" /> : <ShieldCheck className="w-6 h-6 rotate-180" />}
               </div>
-              <h3 className="text-lg font-bold text-center text-[#1F3D2B] mb-2">
+              <h3 className="text-lg font-bold text-center text-soft-pink-800 mb-2">
                 {notification.type === 'success' ? "Berhasil" : "Pemberitahuan"}
               </h3>
               <p className="text-center text-gray-600 text-sm whitespace-pre-line mb-6">
@@ -882,7 +882,7 @@ export default function AdminDashboard() {
               </p>
               <button 
                 onClick={() => setNotification(null)}
-                className="w-full px-4 py-3 bg-[#1F3D2B] text-white rounded-xl font-bold text-sm hover:bg-[#1F3D2B]/90 transition-colors"
+                className="w-full px-4 py-3 bg-soft-pink-100 text-soft-pink-800 rounded-xl font-bold text-sm hover:bg-soft-pink-200 transition-colors"
               >
                 Tutup
               </button>

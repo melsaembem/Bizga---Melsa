@@ -94,7 +94,7 @@ export default function Katalog() {
               placeholder="Cari nasi goreng, tukang pijat, atau baju..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full pl-12 pr-4 py-4 bg-white border border-black/5 rounded-2xl shadow-sm focus:outline-none focus:ring-2 focus:ring-[#1F3D2B]/10 transition-all"
+              className="w-full pl-12 pr-4 py-4 bg-white border border-black/5 rounded-2xl shadow-sm focus:outline-none focus:ring-4 focus:ring-soft-yellow-100 transition-all"
             />
             {searchQuery && (
               <button 
@@ -109,7 +109,7 @@ export default function Katalog() {
       </div>
 
       {/* Filter Categories Horizontal */}
-      <div className="sticky top-16 z-30 bg-[#F5F5F5]/80 backdrop-blur-md py-4 -mx-6 px-6 overflow-x-auto hide-scrollbar">
+      <div className="sticky top-16 z-30 bg-soft-pink-50/80 backdrop-blur-md py-4 -mx-6 px-6 overflow-x-auto hide-scrollbar border-b border-soft-pink-800/5">
         <div className="flex gap-2 min-w-max">
           {["Semua", ...CATEGORIES].map((cat) => (
             <button
@@ -118,8 +118,8 @@ export default function Katalog() {
               className={cn(
                 "px-5 py-2.5 rounded-full text-xs font-bold transition-all border",
                 categoryFilter === cat 
-                  ? "bg-[#1F3D2B] text-white border-[#1F3D2B] shadow-md" 
-                  : "bg-white text-gray-500 border-black/5 hover:border-[#A7C4A0]"
+                  ? "bg-soft-pink-100 text-soft-pink-800 border-soft-pink-800/20 shadow-sm" 
+                  : "bg-white text-gray-500 border-black/5 hover:border-soft-pink-200"
               )}
             >
               {cat}

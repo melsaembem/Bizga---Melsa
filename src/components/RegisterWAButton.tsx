@@ -18,7 +18,7 @@ export default function RegisterWAButton({ className, showSubtext = true }: Regi
       >
         <Link
           to="/upload"
-          className="bg-[#D4A373] text-white font-bold py-4 px-8 rounded-2xl shadow-lg hover:bg-[#c49363] transition-all flex items-center justify-center gap-3 w-full"
+          className="bg-pastel-pink text-pastel-pink-dark font-bold py-4 px-8 rounded-2xl shadow-lg hover:bg-pastel-pink/80 transition-all flex items-center justify-center gap-3 w-full"
         >
           <Store className="w-6 h-6" />
           <div className="text-left">

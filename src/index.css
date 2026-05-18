@@ -4,6 +4,49 @@
 @theme {
   --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
   --font-serif: "Cormorant Garamond", serif;
+
+  --color-soft-pink-50: #FDF2F8;
+  --color-soft-pink-100: #FCE7F3;
+  --color-soft-pink-200: #FBCFE8;
+  --color-soft-pink-300: #F9A8D4;
+  --color-soft-pink-400: #F472B6;
+  --color-soft-pink-500: #EC4899;
+  --color-soft-pink-600: #DB2777;
+  --color-soft-pink-700: #BE185D;
+  --color-soft-pink-800: #9D174D;
+  --color-soft-pink-900: #831843;
+
+  --color-soft-green-50: #F0FDF4;
+  --color-soft-green-100: #DCFCE7;
+  --color-soft-green-200: #BBF7D0;
+  --color-soft-green-500: #22C55E;
+  --color-soft-green-600: #16A34A;
+  --color-soft-green-700: #15803D;
+  --color-soft-green-800: #166534;
+
+  --color-soft-red-50: #FEF2F2;
+  --color-soft-red-100: #FEE2E2;
+  --color-soft-red-200: #FECACA;
+  --color-soft-red-500: #EF4444;
+  --color-soft-red-600: #DC2626;
+  
+  --color-soft-yellow-50: #FFFBEB;
+  --color-soft-yellow-100: #FEF3C7;
+  --color-soft-yellow-200: #FDE68A;
+  --color-soft-yellow-800: #92400E;
+
+  --color-soft-blue-50: #EFF6FF;
+  --color-soft-blue-100: #DBEAFE;
+  --color-soft-blue-200: #BFDBFE;
+  --color-soft-blue-400: #60A5FA;
+  --color-soft-blue-500: #3B82F6;
+  --color-soft-blue-800: #1E40AF;
+
+  /* Shortcuts for convenience */
+  --color-pastel-pink: var(--color-soft-pink-100);
+  --color-pastel-pink-dark: var(--color-soft-pink-800);
+  --color-brand-primary: var(--color-soft-pink-100);
+  --color-brand-secondary: var(--color-soft-pink-200);
 }
 
 @layer base {

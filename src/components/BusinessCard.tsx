@@ -30,12 +30,14 @@ export default function BusinessCard({ business, index }: BusinessCardProps) {
           }}
         />
         <div className="absolute top-3 right-3 flex flex-col items-end gap-2">
-          <div className="bg-white/90 backdrop-blur-sm px-2 py-1 rounded-full text-[10px] font-bold text-[#1F3D2B] uppercase tracking-wider">
+          <div className="bg-white/90 backdrop-blur-sm px-2 py-1 rounded-full text-[10px] font-bold text-soft-pink-800 uppercase tracking-wider">
             {business.category}
           </div>
           <div className={cn(
-            "px-2 py-1 rounded-full text-[9px] font-black uppercase tracking-widest text-white shadow-lg",
-            isOpen ? "bg-green-500" : "bg-red-500"
+            "px-2 py-1 rounded-full text-[9px] font-black uppercase tracking-widest shadow-sm border",
+            isOpen 
+              ? "bg-soft-green-50 text-soft-green-700 border-soft-green-100" 
+              : "bg-soft-red-50 text-soft-red-600 border-soft-red-100"
           )}>
             {isOpen ? "BUKA" : "TUTUP"}
           </div>
@@ -45,9 +47,9 @@ export default function BusinessCard({ business, index }: BusinessCardProps) {
       <div className="p-5 flex-1 flex flex-col">
         <div className="flex justify-between items-start mb-1">
           <Link to={`/bisnis/${business.id}`}>
-            <h3 className="font-bold text-lg text-[#1A1A1A] group-hover:text-[#1F3D2B] transition-colors">{business.name}</h3>
+            <h3 className="font-bold text-lg text-[#1A1A1A] group-hover:text-soft-pink-800 transition-colors">{business.name}</h3>
           </Link>
-          <div className="flex items-center gap-1 text-[#D4A373]">
+          <div className="flex items-center gap-1 text-soft-yellow-800">
             <Star className="w-4 h-4 fill-current" />
             <span className="text-sm font-bold">{business.rating || '5.0'}</span>
           </div>
@@ -63,14 +65,14 @@ export default function BusinessCard({ business, index }: BusinessCardProps) {
         </p>
         
         <div className="mt-auto flex justify-between items-center">
-          <span className="text-[#1F3D2B] font-bold text-sm">
+          <span className="text-soft-pink-800 font-bold text-sm">
             {business.price ? business.price : `Mulai dari Rp 15rb`}
           </span>
           <a 
             href={`https://wa.me/${business.whatsapp}?text=Halo, saya lihat usaha Anda di Bizga: ${business.name}`} 
             target="_blank"
             rel="noopener noreferrer"
-            className="flex items-center gap-2 bg-[#25D366] text-white px-4 py-2 rounded-full text-xs font-bold hover:bg-[#075E54] transition-colors shadow-sm"
+            className="flex items-center gap-2 bg-soft-green-50 text-soft-green-700 px-4 py-2 rounded-full text-xs font-bold border border-soft-green-100 hover:bg-soft-green-100 transition-colors shadow-sm"
           >
             <MessageCircle className="w-4 h-4" />
             CHAT

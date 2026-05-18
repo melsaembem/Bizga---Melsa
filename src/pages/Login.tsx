@@ -2,7 +2,7 @@ import { useState } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { supabase } from "../lib/supabase";
 import { Lock, Mail, Loader2, AlertCircle } from "lucide-react";
-import { motion, AnimatePresence } from "motion/react";
+import { motion } from "motion/react";
 import { cn } from "../lib/utils";
 
 export default function Login() {
@@ -44,10 +44,10 @@ export default function Login() {
         className="max-w-md w-full bg-white rounded-[32px] shadow-2xl p-8 border border-black/5"
       >
         <div className="text-center mb-8">
-          <div className="w-16 h-16 bg-[#1F3D2B]/5 rounded-2xl flex items-center justify-center mx-auto mb-4">
-            <Lock className="w-8 h-8 text-[#1F3D2B]" />
+          <div className="w-16 h-16 bg-pastel-pink rounded-2xl flex items-center justify-center mx-auto mb-4 border border-pastel-pink-dark/10">
+            <Lock className="w-8 h-8 text-pastel-pink-dark" />
           </div>
-          <h2 className="text-2xl font-bold text-[#1A1A1A]">
+          <h2 className="text-2xl font-bold text-pastel-pink-dark">
             Masuk Admin
           </h2>
           <p className="text-sm text-gray-400 mt-1">
@@ -56,19 +56,12 @@ export default function Login() {
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-6">
-          <AnimatePresence>
-            {error && (
-              <motion.div 
-                initial={{ opacity: 0, height: 0 }}
-                animate={{ opacity: 1, height: "auto" }}
-                exit={{ opacity: 0, height: 0 }}
-                className="bg-red-50 text-red-500 p-4 rounded-xl text-xs font-bold flex items-center gap-2 border border-red-100"
-              >
-                <AlertCircle className="w-4 h-4 flex-shrink-0" />
-                {error}
-              </motion.div>
-            )}
-          </AnimatePresence>
+          {error && (
+            <div className="bg-soft-red-50 text-soft-red-600 p-4 rounded-xl text-xs font-bold flex items-center gap-2 border border-soft-red-100">
+              <AlertCircle className="w-4 h-4 flex-shrink-0" />
+              {error}
+            </div>
+          )}
 
           <div className="space-y-2">
             <label className="text-[10px] font-bold text-gray-400 uppercase tracking-widest ml-1">Email</label>
@@ -80,7 +73,7 @@ export default function Login() {
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 placeholder="admin@bizga.com"
-                className="w-full pl-12 pr-4 py-4 bg-[#F5F5F5] border-none rounded-2xl focus:ring-2 focus:ring-[#1F3D2B]/10 font-medium transition-all"
+                className="w-full pl-12 pr-4 py-4 bg-pastel-pink/10 border-none rounded-2xl focus:ring-2 focus:ring-pastel-pink-dark/10 font-medium transition-all"
               />
             </div>
           </div>
@@ -96,7 +89,7 @@ export default function Login() {
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 placeholder="••••••"
-                className="w-full pl-12 pr-4 py-4 bg-[#F5F5F5] border-none rounded-2xl focus:ring-2 focus:ring-[#1F3D2B]/10 font-medium transition-all"
+                className="w-full pl-12 pr-4 py-4 bg-pastel-pink/10 border-none rounded-2xl focus:ring-2 focus:ring-pastel-pink-dark/10 font-medium transition-all"
               />
             </div>
           </div>
@@ -105,7 +98,7 @@ export default function Login() {
             type="submit"
             disabled={loading}
             className={cn(
-              "w-full py-4 bg-[#1F3D2B] text-white font-bold rounded-2xl shadow-xl hover:bg-[#1F3D2B]/90 transition-all flex items-center justify-center gap-2",
+              "w-full py-4 bg-pastel-pink text-pastel-pink-dark font-bold rounded-2xl shadow-lg hover:bg-pastel-pink/80 transition-all flex items-center justify-center gap-2",
               loading && "opacity-50 cursor-not-allowed"
             )}
           >

@@ -28,15 +28,17 @@ export default function Upload() {
     category: CATEGORIES[0] as Category,
     description: "",
     price: "",
+    minPrice: "",
+    maxPrice: "",
     whatsapp: "",
     rt: "00",
     rw: "00",
-    address: "",
+    address: "", // Home Address
     photoURL: "",
     jamBuka: "08:00",
     jamTutup: "20:00",
-    alamat: "",
-    patokan: "",
+    alamat: "", // Business Address
+    patokan: "", // Business Patokan
     linkMaps: ""
   });
 
@@ -61,13 +63,20 @@ export default function Upload() {
         if (error) throw error;
         
         if (data) {
+          const priceStr = data.price || "";
+          const priceMatch = priceStr.match(/\d+/g);
+          const minP = priceMatch ? priceMatch[0] : "";
+          const maxP = priceMatch && priceMatch.length > 1 ? priceMatch[1] : "";
+
           setFormData({
             name: data.name,
             registrantName: data.registrant_name || "",
             registrantPhone: data.registrant_phone || "",
             category: data.category as Category,
             description: data.description,
-            price: data.price || "", 
+            price: priceStr,
+            minPrice: minP ? new Intl.NumberFormat("id-ID").format(parseInt(minP)) : "",
+            maxPrice: maxP ? new Intl.NumberFormat("id-ID").format(parseInt(maxP)) : "",
             whatsapp: data.whatsapp,
             rt: data.rt || "00",
             rw: data.rw || "00",
@@ -107,6 +116,36 @@ export default function Upload() {
     } finally {
       setAiLoading(false);
     }
+  };
+
+  const formatIDRValue = (val: string) => {
+    const digits = val.replace(/\D/g, "");
+    if (!digits) return "";
+    return new Intl.NumberFormat("id-ID").format(parseInt(digits));
+  };
+
+  const handleMinPriceChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const formatted = formatIDRValue(e.target.value);
+    const newFormData = { ...formData, minPrice: formatted };
+    updateCombinedPrice(newFormData);
+  };
+
+  const handleMaxPriceChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const formatted = formatIDRValue(e.target.value);
+    const newFormData = { ...formData, maxPrice: formatted };
+    updateCombinedPrice(newFormData);
+  };
+
+  const updateCombinedPrice = (data: typeof formData) => {
+    let combined = "";
+    if (data.minPrice && data.maxPrice) {
+      combined = `Rp ${data.minPrice} - Rp ${data.maxPrice}`;
+    } else if (data.minPrice) {
+      combined = `Rp ${data.minPrice}`;
+    } else if (data.maxPrice) {
+      combined = `Rp ${data.maxPrice}`;
+    }
+    setFormData({ ...data, price: combined });
   };
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -258,28 +297,28 @@ export default function Upload() {
       <div className="mb-10 text-center relative">
         <button 
           onClick={() => navigate(user ? dashboardPath : "/")}
-          className="absolute left-0 top-0 p-2 text-gray-400 hover:text-[#1F3D2B] transition-colors"
+          className="absolute left-0 top-0 p-2 text-gray-400 hover:text-soft-pink-800 transition-colors"
         >
           <ChevronLeft className="w-6 h-6" />
         </button>
         
         {!isAdmin && (
-          <div className="mb-6 p-4 bg-[#D4A373]/10 border border-[#D4A373]/30 rounded-2xl flex items-start gap-4">
-            <div className="w-10 h-10 bg-white rounded-full flex items-center justify-center flex-shrink-0 shadow-sm text-[#D4A373]">
+          <div className="mb-6 p-4 bg-soft-yellow-50 text-soft-yellow-800 rounded-2xl flex items-start gap-4 border border-soft-yellow-100">
+            <div className="w-10 h-10 bg-white rounded-full flex items-center justify-center flex-shrink-0 shadow-sm text-soft-yellow-800">
               <Phone className="w-5 h-5" />
             </div>
-            <div className="text-left text-sm text-[#5D4037]">
+            <div className="text-left text-sm text-soft-yellow-800">
               <p className="font-bold mb-1">Ada pertanyaan tentang pendaftaran?</p>
               <p>Tim admin kami siap membantu. Hubungi WA: <strong>0812-3456-7890</strong> (Tanya-tanya gratis!)</p>
             </div>
           </div>
         )}
 
-        <div className="inline-flex items-center gap-2 px-4 py-2 bg-[#D4A373]/10 text-[#D4A373] rounded-full text-xs font-bold uppercase tracking-widest mb-4 border border-[#D4A373]/20">
+        <div className="inline-flex items-center gap-2 px-4 py-2 bg-pastel-pink text-pastel-pink-dark rounded-full text-xs font-bold uppercase tracking-widest mb-4 border border-pastel-pink-dark/20">
           <Sparkles className="w-4 h-4" />
           {isAdmin ? "ADMIN PORTAL" : "PENDAFTARAN USAHA"}
         </div>
-        <h1 className="text-3xl font-bold text-[#1F3D2B]">
+        <h1 className="text-3xl font-bold text-soft-pink-800">
           {id ? "Edit Data Usaha" : "Daftarkan Usaha Baru"}
         </h1>
         <p className="text-sm text-gray-400 mt-2">
@@ -290,7 +329,7 @@ export default function Upload() {
       <div className="bg-white rounded-3xl shadow-xl border border-black/5 overflow-hidden">
         {/* Progress Bar */}
         <div className="bg-[#F5F5F5] h-2 w-full flex">
-          <div className={`transition-all duration-500 h-full bg-[#1F3D2B] ${step === 1 ? 'w-1/3' : step === 2 ? 'w-2/3' : 'w-full'}`}></div>
+          <div className={`transition-all duration-500 h-full bg-soft-pink-800/30 ${step === 1 ? 'w-1/3' : step === 2 ? 'w-2/3' : 'w-full'}`}></div>
         </div>
 
         <div className="p-8">
@@ -302,7 +341,7 @@ export default function Upload() {
                 exit={{ opacity: 0, height: 0 }}
                 className={cn(
                   "mb-6 p-4 rounded-xl text-xs font-bold flex items-center gap-2 border",
-                  notification.type === 'success' ? "bg-green-50 text-green-600 border-green-100" : "bg-red-50 text-red-600 border-red-100"
+                  notification.type === 'success' ? "bg-soft-green-50 text-soft-green-700 border-soft-green-100" : "bg-soft-red-50 text-soft-red-600 border-soft-red-100"
                 )}
               >
                 {notification.type === 'success' ? <Check className="w-4 h-4" /> : <AlertCircle className="w-4 h-4" />}
@@ -328,7 +367,7 @@ export default function Upload() {
                       placeholder="Contoh: Budi Santoso"
                       value={formData.registrantName}
                       onChange={(e) => setFormData({...formData, registrantName: e.target.value})}
-                      className="w-full px-4 py-3 bg-amber-50 border-none rounded-xl focus:ring-2 focus:ring-[#1F3D2B]/10 font-bold"
+                      className="w-full px-4 py-3 bg-soft-pink-50 border-none rounded-xl focus:ring-2 focus:ring-soft-pink-200 font-bold"
                     />
                   </div>
                   <div className="space-y-2">
@@ -338,35 +377,24 @@ export default function Upload() {
                       placeholder="Contoh: 081234567890"
                       value={formData.registrantPhone}
                       onChange={(e) => setFormData({...formData, registrantPhone: e.target.value})}
-                      className="w-full px-4 py-3 bg-amber-50 border-none rounded-xl focus:ring-2 focus:ring-[#1F3D2B]/10 font-bold"
+                      className="w-full px-4 py-3 bg-soft-pink-50 border-none rounded-xl focus:ring-2 focus:ring-soft-pink-200 font-bold"
                     />
                   </div>
                 </div>
 
                 <div className="space-y-4">
                   <div className="space-y-2">
-                    <label className="text-xs font-bold text-gray-500 uppercase">Alamat Lengkap</label>
+                    <label className="text-xs font-bold text-gray-500 uppercase">Alamat Rumah (Sesuai KTP)</label>
                     <div className="relative">
                       <MapIcon className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-300" />
                       <input 
                         type="text" 
                         placeholder="Contoh: Jl. Sudirman No 123"
-                        value={formData.alamat}
-                        onChange={(e) => setFormData({...formData, alamat: e.target.value})}
-                        className="w-full pl-12 pr-4 py-3 bg-[#F5F5F5] border-none rounded-xl focus:ring-2 focus:ring-[#1F3D2B]/10 font-medium text-sm"
+                        value={formData.address}
+                        onChange={(e) => setFormData({...formData, address: e.target.value})}
+                        className="w-full pl-12 pr-4 py-3 bg-[#F5F5F5] border-none rounded-xl focus:ring-2 focus:ring-soft-pink-200 font-medium text-sm"
                       />
                     </div>
-                  </div>
-                  
-                  <div className="space-y-2">
-                    <label className="text-xs font-bold text-gray-500 uppercase">Patokan / Keterangan Tepat (Opsional)</label>
-                    <input 
-                      type="text" 
-                      placeholder="Contoh: Depan Masjid Al-Ikhlas, Samping Warung Bu Siti"
-                      value={formData.patokan}
-                      onChange={(e) => setFormData({...formData, patokan: e.target.value})}
-                      className="w-full px-4 py-3 bg-[#F5F5F5] border-none rounded-xl focus:ring-2 focus:ring-[#1F3D2B]/10 font-medium text-sm"
-                    />
                   </div>
                 </div>
 
@@ -383,8 +411,8 @@ export default function Upload() {
 
                 <button 
                   onClick={() => setStep(2)}
-                  disabled={!formData.registrantName.trim() || !formData.registrantPhone.trim() || !formData.alamat.trim()}
-                  className="w-full py-4 bg-[#D4A373] text-white font-bold rounded-2xl shadow-xl hover:bg-[#c29161] transition-all flex items-center justify-center gap-2 disabled:opacity-50 mt-8"
+                  disabled={!formData.registrantName.trim() || !formData.registrantPhone.trim() || !formData.address.trim()}
+                  className="w-full py-4 bg-pastel-pink text-pastel-pink-dark font-bold rounded-2xl shadow-lg hover:bg-pastel-pink/80 transition-all flex items-center justify-center gap-2 disabled:opacity-50 mt-8"
                 >
                   Selanjutnya (Info Usaha)
                 </button>
@@ -405,7 +433,7 @@ export default function Upload() {
                       placeholder="Babi Guling Pak Nyoman"
                       value={formData.name}
                       onChange={(e) => setFormData({...formData, name: e.target.value})}
-                      className="w-full px-4 py-3 bg-[#F5F5F5] border-none rounded-xl focus:ring-2 focus:ring-[#1F3D2B]/10 font-bold"
+                      className="w-full px-4 py-3 bg-[#F5F5F5] border-none rounded-xl focus:ring-2 focus:ring-soft-pink-200 font-bold"
                     />
                   </div>
                   <div className="space-y-2">
@@ -413,7 +441,7 @@ export default function Upload() {
                     <select 
                       value={formData.category}
                       onChange={(e) => setFormData({...formData, category: e.target.value as Category})}
-                      className="w-full px-4 py-3 bg-[#F5F5F5] border-none rounded-xl focus:ring-2 focus:ring-[#1F3D2B]/10 font-bold appearance-none cursor-pointer"
+                      className="w-full px-4 py-3 bg-[#F5F5F5] border-none rounded-xl focus:ring-2 focus:ring-soft-pink-200 font-bold appearance-none cursor-pointer"
                     >
                       {CATEGORIES.map(c => <option key={c} value={c}>{c}</option>)}
                     </select>
@@ -427,21 +455,63 @@ export default function Upload() {
                     rows={4}
                     value={formData.description}
                     onChange={(e) => setFormData({...formData, description: e.target.value})}
-                    className="w-full px-4 py-3 bg-[#F5F5F5] border-none rounded-xl focus:ring-2 focus:ring-[#1F3D2B]/10 font-medium text-sm"
+                    className="w-full px-4 py-3 bg-[#F5F5F5] border-none rounded-xl focus:ring-2 focus:ring-soft-pink-200 font-medium text-sm"
                   />
                 </div>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                   <div className="space-y-2">
-                    <label className="text-xs font-bold text-gray-500 uppercase">Harga / Range Harga</label>
+                  <div className="space-y-2">
+                    <label className="text-xs font-bold text-gray-500 uppercase">Alamat Tempat Usaha/Jualan</label>
                     <input 
                       type="text" 
-                      placeholder="Contoh: Mulai Rp 15rb atau Rp 50.000"
-                      value={formData.price}
-                      onChange={(e) => setFormData({...formData, price: e.target.value})}
-                      className="w-full px-4 py-3 bg-[#F5F5F5] border-none rounded-xl focus:ring-2 focus:ring-[#1F3D2B]/10 font-bold"
+                      placeholder="Contoh: Depan Indomaret Duren Sawit"
+                      value={formData.alamat}
+                      onChange={(e) => setFormData({...formData, alamat: e.target.value})}
+                      className="w-full px-4 py-3 bg-[#F5F5F5] border-none rounded-xl focus:ring-2 focus:ring-soft-pink-200 font-medium text-sm"
                     />
                   </div>
+                  <div className="space-y-2">
+                    <label className="text-xs font-bold text-gray-500 uppercase">Patokan Usaha</label>
+                    <input 
+                      type="text" 
+                      placeholder="Contoh: Samping Toko Plastik"
+                      value={formData.patokan}
+                      onChange={(e) => setFormData({...formData, patokan: e.target.value})}
+                      className="w-full px-4 py-3 bg-[#F5F5F5] border-none rounded-xl focus:ring-2 focus:ring-soft-pink-200 font-medium text-sm"
+                    />
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                   <div className="space-y-2">
+                    <label className="text-xs font-bold text-gray-500 uppercase">Harga Termurah (Rp)</label>
+                    <div className="relative">
+                      <span className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 font-bold text-sm">Rp</span>
+                      <input 
+                        type="text" 
+                        placeholder="10.000"
+                        value={formData.minPrice}
+                        onChange={handleMinPriceChange}
+                        className="w-full pl-12 pr-4 py-3 bg-[#F5F5F5] border-none rounded-xl focus:ring-2 focus:ring-soft-pink-200 font-bold text-sm"
+                      />
+                    </div>
+                  </div>
+                  <div className="space-y-2">
+                    <label className="text-xs font-bold text-gray-500 uppercase">Harga Terbesar (Rp)</label>
+                    <div className="relative">
+                      <span className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 font-bold text-sm">Rp</span>
+                      <input 
+                        type="text" 
+                        placeholder="50.000"
+                        value={formData.maxPrice}
+                        onChange={handleMaxPriceChange}
+                        className="w-full pl-12 pr-4 py-3 bg-[#F5F5F5] border-none rounded-xl focus:ring-2 focus:ring-soft-pink-200 font-bold text-sm"
+                      />
+                    </div>
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   <div className="space-y-2">
                     <label className="text-xs font-bold text-gray-500 uppercase">Nomor WhatsApp Usaha</label>
                     <input 
@@ -449,7 +519,7 @@ export default function Upload() {
                       placeholder="628123456789"
                       value={formData.whatsapp}
                       onChange={(e) => setFormData({...formData, whatsapp: e.target.value})}
-                      className="w-full px-4 py-3 bg-[#F5F5F5] border-none rounded-xl focus:ring-2 focus:ring-[#1F3D2B]/10 font-bold"
+                      className="w-full px-4 py-3 bg-[#F5F5F5] border-none rounded-xl focus:ring-2 focus:ring-soft-pink-200 font-bold"
                     />
                   </div>
                 </div>
@@ -490,7 +560,7 @@ export default function Upload() {
                       placeholder="https://maps.google.com/..."
                       value={formData.linkMaps}
                       onChange={(e) => setFormData({...formData, linkMaps: e.target.value})}
-                      className="w-full pl-12 pr-4 py-3 bg-[#F5F5F5] border-none rounded-xl focus:ring-2 focus:ring-[#1F3D2B]/10 font-medium text-sm"
+                      className="w-full pl-12 pr-4 py-3 bg-[#F5F5F5] border-none rounded-xl focus:ring-2 focus:ring-soft-pink-200 font-medium text-sm"
                     />
                   </div>
                 </div>
@@ -501,7 +571,7 @@ export default function Upload() {
                     <div className="flex-1 space-y-4">
                       {/* File Upload Option */}
                       <div 
-                        className="relative group cursor-pointer border-2 border-dashed border-gray-200 rounded-2xl p-8 hover:border-[#1F3D2B] transition-all bg-[#F5F5F5]/50 hover:bg-white text-center"
+                        className="relative group cursor-pointer border-2 border-dashed border-gray-200 rounded-2xl p-8 hover:border-soft-pink-200 transition-all bg-[#F5F5F5]/50 hover:bg-white text-center"
                         onClick={() => document.getElementById('imageInput')?.click()}
                       >
                         <input 
@@ -512,8 +582,8 @@ export default function Upload() {
                           className="hidden"
                         />
                         <div className="flex flex-col items-center gap-2">
-                           <ImageIcon className="w-8 h-8 text-gray-400 group-hover:text-[#1F3D2B] transition-colors" />
-                           <p className="text-sm font-bold text-gray-500 group-hover:text-[#1F3D2B]">Klik atau Seret Foto ke sini</p>
+                           <ImageIcon className="w-8 h-8 text-gray-400 group-hover:text-soft-pink-800 transition-colors" />
+                           <p className="text-sm font-bold text-gray-500 group-hover:text-soft-pink-800">Klik atau Seret Foto ke sini</p>
                            <p className="text-[10px] text-gray-400">Pastikan format JPG, PNG, atau WEBP</p>
                         </div>
                       </div>
@@ -531,12 +601,12 @@ export default function Upload() {
                               setImagePreview(null);
                             }
                           }}
-                          className="w-full pl-12 pr-4 py-3 bg-[#F5F5F5] border-none rounded-xl focus:ring-2 focus:ring-[#1F3D2B]/10 font-medium text-sm"
+                          className="w-full pl-12 pr-4 py-3 bg-[#F5F5F5] border-none rounded-xl focus:ring-2 focus:ring-soft-pink-200 font-medium text-sm"
                         />
                       </div>
                     </div>
                     {(imagePreview || formData.photoURL) && (
-                      <div className="w-full md:w-32 h-32 rounded-2xl overflow-hidden border-2 border-[#D4A373]/20 shrink-0 shadow-inner relative group">
+                      <div className="w-full md:w-32 h-32 rounded-2xl overflow-hidden border-2 border-pastel-pink/20 shrink-0 shadow-inner relative group">
                         <img 
                           src={imagePreview || formData.photoURL} 
                           alt="Preview" 
@@ -563,7 +633,7 @@ export default function Upload() {
                   <button 
                     onClick={handleGenerateAI}
                     disabled={aiLoading || !formData.name || !formData.description}
-                    className="flex-[2] py-4 bg-[#1F3D2B] text-white font-bold rounded-2xl shadow-xl hover:bg-[#1F3D2B]/90 transition-all flex items-center justify-center gap-2 disabled:opacity-50"
+                    className="flex-[2] py-4 bg-soft-pink-100 text-soft-pink-800 font-bold rounded-2xl shadow-lg hover:bg-soft-pink-200 transition-all flex items-center justify-center gap-2 disabled:opacity-50"
                   >
                     {aiLoading ? (
                       <>
@@ -572,7 +642,7 @@ export default function Upload() {
                       </>
                     ) : (
                       <>
-                        <Sparkles className="w-5 h-5 text-[#D4A373]" />
+                        <Sparkles className="w-5 h-5 text-pastel-pink-dark" />
                         Buat Kata-Kata Promosi
                       </>
                     )}
@@ -587,11 +657,11 @@ export default function Upload() {
                 className="space-y-8"
               >
                 <div className="bg-[#F5F5F5] p-6 rounded-3xl relative overflow-hidden group">
-                  <div className="absolute top-0 right-0 p-3 opacity-10 group-hover:opacity-20 transition-opacity">
-                    <Sparkles className="w-12 h-12 text-[#1F3D2B]" />
+                  <div className="absolute top-0 right-0 p-3 opacity-20 group-hover:opacity-30 transition-opacity">
+                    <Sparkles className="w-12 h-12 text-soft-pink-800" />
                   </div>
-                  <h4 className="text-[10px] font-bold text-[#1F3D2B] uppercase tracking-widest mb-4 flex items-center gap-2">
-                    <span className="w-2 h-2 bg-[#D4A373] rounded-full animate-pulse"></span>
+                  <h4 className="text-[10px] font-bold text-soft-pink-800 uppercase tracking-widest mb-4 flex items-center gap-2">
+                    <span className="w-2 h-2 bg-pastel-pink-dark rounded-full animate-pulse"></span>
                     Caption Katalog (Otomatis AI)
                   </h4>
                   <div className="prose prose-sm text-[#1A1A1A] leading-relaxed italic">
@@ -605,8 +675,8 @@ export default function Upload() {
                   </div>
                 </div>
 
-                <div className="bg-white p-6 rounded-3xl border-2 border-[#25D366]/20 relative">
-                  <h4 className="text-[10px] font-bold text-[#25D366] uppercase tracking-widest mb-2 flex items-center gap-2">
+                <div className="bg-white p-6 rounded-3xl border-2 border-soft-green-100 relative">
+                  <h4 className="text-[10px] font-bold text-soft-green-700 uppercase tracking-widest mb-2 flex items-center gap-2">
                     Versi Status WhatsApp
                   </h4>
                   <p className="text-sm font-medium text-gray-600 line-clamp-3">
@@ -624,7 +694,7 @@ export default function Upload() {
                   <button 
                     onClick={handleSubmit}
                     disabled={loading || isUploading}
-                    className="flex-[2] py-4 bg-[#1F3D2B] text-white font-bold rounded-2xl shadow-xl hover:bg-[#1F3D2B]/90 transition-all flex items-center justify-center gap-2"
+                    className="flex-[2] py-4 bg-soft-pink-100 text-soft-pink-800 font-bold rounded-2xl shadow-lg hover:bg-soft-pink-200 transition-all flex items-center justify-center gap-2"
                   >
                     {loading || isUploading ? <Loader2 className="w-5 h-5 animate-spin" /> : <Send className="w-5 h-5" />}
                     {isUploading ? "Mengupload Gambar..." : "Publish Katalog Sekarang"}

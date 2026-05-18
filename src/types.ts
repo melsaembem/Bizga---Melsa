@@ -21,6 +21,7 @@ export interface Business {
   jamBuka?: string;
   jamTutup?: string;
   alamat?: string;
+  patokan?: string;
   linkMaps?: string;
   ownerId: string;
   rating: number;

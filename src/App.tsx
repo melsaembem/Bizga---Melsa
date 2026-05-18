@@ -61,8 +61,8 @@ export default function App() {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-[#F5F5F5]">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#1F3D2B]"></div>
+      <div className="min-h-screen flex items-center justify-center bg-gray-50">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-soft-pink-800"></div>
       </div>
     );
   }
@@ -70,7 +70,7 @@ export default function App() {
   return (
     <AuthContext.Provider value={{ user, loading, isAdmin }}>
       <Router>
-        <div className="min-h-screen bg-[#F5F5F5] pb-20 md:pb-0 font-sans">
+        <div className="min-h-screen bg-soft-pink-50/10 pb-20 md:pb-0 font-sans">
           <Navbar />
           <div className="pt-16">
             <Routes>
